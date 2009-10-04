@@ -26,14 +26,17 @@ class StackBehavior < Given::Behavior
   end
 
   Given(:stack_with_two_items) {
-    Then { @stack.top == :two }
+    Then { @stack.top == :top_item }
 
     When { @result = @stack.pop }
     Then { @result == :top_item }
     Then { @stack.top == :bottom_item }
     Then { @stack.size == 1 }
 
-    When { @stack.pop; @result = @stack.pop }
+    When {
+      @stack.pop
+      @result = @stack.pop
+    }
     Then { @result == :bottom_item }
     Then { @stack.size == 0 }
   }
@@ -112,4 +115,5 @@ h2. Summary
 
 Feel free to comment on the ideas here.  Eventually I hope to have a working prototype.
 
+<hr>
 fn1. Right, like Ruby doesn't have enough of them.

@@ -1,0 +1,114 @@
+<notextile><!-- -*- mode: textile; fill-column: 1000000; -*- --></notextile>
+h1. Thoughts on a new Ruby Specification Framework
+
+I've been playing aournd with some ideas for a new testing/specification framework for Ruby[1].  I've been trying to write down some of the motivation for this, but that's taking too long.  I just want to get some ideas down and published for review and we will address the whys and wherefores later.
+
+Essentially, I've been inspired by the Cucumber framework to bring the given/when/then style of specifications directly into unit tests.  So
+
+
+h2. Example Zero
+
+Here's the spec that I've been playing with.  Its gone through mulitple revisions and at least one prototype implementation.  And this is probably not the final form.
+
+With all that in mind, here's a specification in my imaginary framework:
+
+<pre>
+class StackBehavior < Given::Behavior
+  Invariant { @stack.empty? == (@stack.size == 0) }
+  
+  Given(:empty_stack) do
+    Then { @stack.size == 0 }
+
+    When { @stack.push(:an_item) }
+    Then { @stack.size == 1 }
+    Then { @stack.top == :an_item }
+  end
+
+  Given(:stack_with_two_items) {
+    Then { @stack.top == :two }
+
+    When { @result = @stack.pop }
+    Then { @result == :top_item }
+    Then { @stack.top == :bottom_item }
+    Then { @stack.size == 1 }
+
+    When { @stack.pop; @result = @stack.pop }
+    Then { @result == :bottom_item }
+    Then { @stack.size == 0 }
+  }
+
+  def empty_stack
+    @stack = Stack.new
+  end
+
+  def stack_with_two_items
+    empty_stack
+    @stack.push(:bottom_item)
+    @stack.push(:top_item)
+  end
+end
+</pre>
+
+Let's talk about the individual sections.
+
+h3. Given
+
+The _Given_ section specifies a starting point, a set of preconditions that must be true before the code under test is allowed to be run.  In standard test frameworks the preconditions are established with a combination of setup methods (or :before actions in RSpec) and code in the test.
+
+In the example code above, we see two starting points of interest.  One is an empty, just freshly created stack.  The other starting point is a stack with several items already push onto it.
+
+The setup methods are explicitly named by the given section.  The name of the setup method should be carefully named to provide the human reader the necessary information. 
+
+h3. When
+
+The _When_ section specifies the code to be tested ... oops, excuse me ... specified.  After the preconditions in the given section are met, the when code block is run.
+
+h3. Then
+
+The _Then_ sections are the postconditions of the specification. These then conditions must be true after the code under test (the _When_ block) is run.
+
+The code in the _Then_ block should be a single boolean condition that evaluates to true if the code in the _When_ block is correct.  If the _Then_ block evaluates to false, then that is recorded as a failure.
+
+h3. Invariant
+
+The _Invariant_ block is a new idea that doesn't have an analog in RSpec or Test::Unit.  The invariant allows you specify things that must always be true.  In the stack example, <tt>empty?</tt> is defined in term of <tt>size</tt>.  Whenever <tt>size</tt> is 0, <tt>empty?</tt> should be true.   Whenever <tt>size</tt> is non-zero, <tt>empty?</tt> should be false.
+
+You can conceptually think of an _Invariant_ block as a _Then_ block that automatically gets added to every _When_ within its scope.
+
+h2. Other Ideas
+
+That's the basics of what I'm trying to do.  Here are some more ideas.
+
+h3. Nesting Givens
+
+Although the example doesn't demonstrate this, I think the _Given_ blocks should be allowed to nest.  This is similar to the nested contexts in Shoulda or the nested describe blocks in RSpec.
+
+h3. Direct Code in Givens
+
+Since the block on a _Given_ section is used to scope the <em>When</em>'s and <em>Then</em>s, it can't be used to directly specify the setup code.  That's why we put the setup code in a named method and pass the name of the method to the _Given_.  I actually like the way that reads, but also am wondering if there is a way to allow direct code as well.
+
+Here's one idea:
+
+<pre>
+  Given(Setup { @stack = Stack.new }) do
+    When { ... }
+    Then { ... }
+  end
+</pre>
+
+Here's another idea:
+
+<pre>
+  Given { @stack = Stack.new }.and do
+    When { ... }
+    Then { ... }
+  end
+</pre>
+
+I think both options are ugly.
+
+h2. Summary
+
+Feel free to comment on the ideas here.  Eventually I hope to have a working prototype.
+
+fn1. Right, like Ruby doesn't have enough of them.

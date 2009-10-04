@@ -1,4 +1,5 @@
-<notextile><!-- -*- mode: textile; fill-column: 1000000; -*- --></notextile>
+p{display=none}. <notextile><!-- -*- mode: textile; fill-column: 1000000; -*- --></notextile>
+
 h1. Thoughts on a new Ruby Specification Framework
 
 I've been playing aournd with some ideas for a new testing/specification framework for Ruby[1].  I've been trying to write down some of the motivation for this, but that's taking too long.  I just want to get some ideas down and published for review and we will address the whys and wherefores later.

@@ -4,7 +4,7 @@ h1. Thoughts on a new Ruby Specification Framework
 
 I've been playing aournd with some ideas for a new testing/specification framework for Ruby[1].  I've been trying to write down some of the motivation for this, but that's taking too long.  I just want to get some ideas down and published for review and we will address the whys and wherefores later.
 
-Essentially, I've been inspired by the Cucumber framework to bring the given/when/then style of specifications directly into unit tests.  So
+Essentially, I've been inspired by the Cucumber framework to bring the given/when/then style of specifications directly into unit tests.  So let's get right into it.
 
 
 h2. Example Zero

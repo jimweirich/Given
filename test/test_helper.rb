@@ -1,4 +1,33 @@
+require 'test/unit'
 require 'given'
+
+class GivenTestCase < Test::Unit::TestCase
+  private
+
+  def assert_all_pass(run_count=nil, &block)
+    tally = run_tests(&block)
+    assert tally.passed?
+    unless run_count.nil?
+      assert_equal(run_count, tally.run_count,
+        "Wrong number of test runs")
+    end
+  end
+
+  def run_tests(&block)
+    tests = test_class(&block)
+    suite = tests.suite
+    tally = Test::Unit::TestResult.new
+    suite.run(tally) { }
+    tally
+  end
+
+  def test_class(&block)
+    Class.new(FauxTestCase, &block)
+  end
+
+  def default_test
+  end
+end  
 
 # Fake TestCase for testing.  This has everything the real
 # Test::Unit::TestCase has, except that it won't trigger auto-testing.
@@ -60,7 +89,7 @@ class FauxTestCase
     begin
       setup
       __send__(@method_name)
-    rescue AssertionFailedError => e
+    rescue Test::Unit::AssertionFailedError => e
       add_failure(e.message, e.backtrace)
     rescue Exception
       raise if PASSTHROUGH_EXCEPTIONS.include? $!.class
@@ -68,7 +97,7 @@ class FauxTestCase
     ensure
       begin
         teardown
-      rescue AssertionFailedError => e
+      rescue Test::Unit::AssertionFailedError => e
         add_failure(e.message, e.backtrace)
       rescue Exception
         raise if PASSTHROUGH_EXCEPTIONS.include? $!.class
@@ -112,13 +141,13 @@ class FauxTestCase
   
   def add_failure(message, all_locations=caller())
     @test_passed = false
-    @_result.add_failure(Failure.new(name, filter_backtrace(all_locations), message))
+    @_result.add_failure(Test::Unit::Failure.new(name, filter_backtrace(all_locations), message))
   end
   private :add_failure
   
   def add_error(exception)
     @test_passed = false
-    @_result.add_error(Error.new(name, exception))
+    @_result.add_error(Test::Unit::Error.new(name, exception))
   end
   private :add_error
   

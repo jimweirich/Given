@@ -1,5 +1,6 @@
 require 'test/unit'
 require 'given'
+require 'given/test_unit/adapter'
 
 class GivenTestCase < Test::Unit::TestCase
   private
@@ -31,6 +32,7 @@ end
 
 # Fake TestCase for testing.  This has everything the real
 # Test::Unit::TestCase has, except that it won't trigger auto-testing.
+# We use this to construct test cases.
 class FauxTestCase
   include Test::Unit::Assertions
   include Test::Unit::Util::BacktraceFilter
@@ -172,6 +174,8 @@ end
 
 
 class GivenFauxTestCase < FauxTestCase
+  include Given::TestUnit::Adapter
+
   # A track array is used by many tests to record the order of events.
   def a_track
     @track = []

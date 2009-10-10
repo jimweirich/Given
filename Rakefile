@@ -3,13 +3,12 @@ require 'rake/testtask'
 
 CLOBBER.include("html")
 
-task :default => :test
+task :default => ["test:units", "test:functionals"]
 
-Rake::TestTask.new do |t|
-  t.verbose = true
-  t.warning = true
-  t.test_files = FileList['test/**/*_test.rb']
-end
+
+task :tf => "test:functionals"
+
+# README Formatting --------------------------------------------------
 
 require 'redcloth'
 

@@ -22,7 +22,7 @@ class GivenTestCase < Test::Unit::TestCase
   end
 
   def test_class(&block)
-    Class.new(FauxTestCase, &block)
+    Class.new(GivenFauxTestCase, &block)
   end
 
   def default_test
@@ -167,5 +167,13 @@ class FauxTestCase
     return false unless(other.kind_of?(self.class))
     return false unless(@method_name == other.method_name)
     self.class == other.class
+  end
+end
+
+
+class GivenFauxTestCase < FauxTestCase
+  # A track array is used by many tests to record the order of events.
+  def a_track
+    @track = []
   end
 end

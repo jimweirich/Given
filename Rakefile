@@ -5,7 +5,7 @@ CLOBBER.include("html")
 
 task :default => ["test:units", "test:functionals"]
 
-
+task :tu => "test:units"
 task :tf => "test:functionals"
 
 # README Formatting --------------------------------------------------

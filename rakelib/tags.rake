@@ -4,6 +4,7 @@ module Tags
   PROG = ENV['TAGS'] || '/usr/local/bin/xctags' || 'ctags'
   RUBY_FILES = FileList['**/*.rb']
   RUBY_FILES.include('**/*.rake')
+  RUBY_FILES.include('/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/lib/ruby/1.8/test/**/*.rb')
 end
 
 namespace "tags" do

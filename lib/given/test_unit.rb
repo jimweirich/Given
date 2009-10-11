@@ -1,6 +1,6 @@
 require 'given'
 require 'test/unit'
-require 'given/testunit/adapter'
+require 'given/test_unit/adapter'
 
 module Given
   class Contract < Test::Unit::TestCase

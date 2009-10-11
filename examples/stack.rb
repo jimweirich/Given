@@ -3,7 +3,7 @@ class Stack
     @items = []
   end
 
-  def size
+  def depth
     @items.size
   end
 

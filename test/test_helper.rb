@@ -7,7 +7,7 @@ class GivenTestCase < Test::Unit::TestCase
 
   def assert_all_pass(run_count=nil, &block)
     tally = run_tests(&block)
-    assert tally.passed?
+    assert tally.passed?, tally.inspect
     unless run_count.nil?
       assert_equal(run_count, tally.run_count,
         "Wrong number of test runs")

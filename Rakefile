@@ -8,6 +8,11 @@ task :default => ["test:units", "test:functionals"]
 task :tu => "test:units"
 task :tf => "test:functionals"
 
+EXAMPLE_FILES = FileList['examples/*_behavior.rb']
+task :examples do
+  ruby "-I.:lib #{EXAMPLE_FILES}"
+end
+
 # README Formatting --------------------------------------------------
 
 require 'redcloth'

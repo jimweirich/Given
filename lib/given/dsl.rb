@@ -34,7 +34,7 @@ module Given
         instance_eval(&when_code)
         given_assert(then_block)
         invariant_codes.each do |inv|
-          assert instance_eval(&inv)
+          given_assert(inv)
         end
       end
     end

@@ -7,6 +7,7 @@ class AdapterTest < Given::Contract
   include Given::TestUnit::Adapter
 
   def add_assertion
+    super
     @assertion_counted = true
   end
 

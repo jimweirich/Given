@@ -27,9 +27,9 @@ class FailsTest < GivenTestCase
     tally = run_tests do
       Given do
         When { fail "OUCH" }
-        Fails(RuntimeError) { |ex|
-          ex.class == RuntimeError &&
-          ex.message == "XXXX"
+        Fails(RuntimeError) { 
+          @exception.class == RuntimeError &&
+          @exception.message == "XXXX"
         }          
       end
     end

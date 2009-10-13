@@ -20,6 +20,15 @@ class ThenTest < GivenTestCase
     assert ! tally.passed?
   end
 
+  def test_then_fails_if_block_fails
+    tally = run_tests do
+      Given do
+        Then { fail "OUCH" }
+      end
+    end
+    assert ! tally.passed?
+  end
+
   def test_multiple_thens_create_multiple_tests
     assert_all_pass(2) do
       Given do

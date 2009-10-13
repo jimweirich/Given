@@ -4,7 +4,7 @@ require 'examples/stack'
 class StackBehavior < Given::Contract
   Invariant { @stack.depth >= 0 }
   Invariant { @stack.empty? == (@stack.depth == 0) }
-  
+
   Given(:empty_stack) do
     Then { @stack.depth == 0 }
 

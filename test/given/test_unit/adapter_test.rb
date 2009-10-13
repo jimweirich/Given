@@ -6,9 +6,13 @@ require 'given/test_unit'
 class AdapterTest < Given::Contract
   include Given::TestUnit::Adapter
 
+  def add_assertion
+    @assertion_counted = true
+  end
+
   Given do
     When { given_assert(lambda { true }) }
-    Then { :ok }
+    Then { @assertion_counted }
   end
 
   def test_given_fails_with_file_and_line_with_false_block

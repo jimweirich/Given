@@ -39,6 +39,28 @@ module Given
       end
     end
 
+    def Fails(exception_class, &fail_code)
+      given_must_have_given_context("Fails")
+      @given_counter ||= 0
+      @given_counter += 1
+      setups = @given_setups
+      when_code = @given_when
+      invariant_codes = @given_invariants
+      define_method "test_given__#{@given_counter}" do
+        setups.each do |s| send s end
+        begin
+          instance_eval(&when_code)
+          given_assert(lambda { false })
+        rescue exception_class => ex
+          @exception = ex
+          given_assert(fail_code) if block_given?
+        end
+        invariant_codes.each do |inv|
+          given_assert(inv)
+        end
+      end
+    end
+
     def Invariant(&block)
       @given_invariants ||= []
       @given_invariants += [block]

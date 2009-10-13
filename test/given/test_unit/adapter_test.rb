@@ -3,11 +3,12 @@
 require 'test/unit'
 require 'given/test_unit'
 
-class AdapterTest < Test::Unit::TestCase
+class AdapterTest < Given::Contract
   include Given::TestUnit::Adapter
 
-  def test_given_does_nothing_with_true_block
-    given_assert(lambda { true })
+  Given do
+    When { given_assert(lambda { true }) }
+    Then { :ok }
   end
 
   def test_given_fails_with_file_and_line_with_false_block
@@ -19,6 +20,16 @@ class AdapterTest < Test::Unit::TestCase
     assert_match(/#{__FILE__}:#{line}/, ex.message)
   end
 
+
+  Given do
+    When {
+      given_assert(lambda { fail "OUCH" })
+    }
+    Fails(RuntimeError) {
+      @exception.message == "OUCH"
+    }
+  end
+  
   def test_given_fails_with_actual_exception
     ex = assert_raise(RuntimeError) do
       given_assert(lambda { fail "OUCH" })

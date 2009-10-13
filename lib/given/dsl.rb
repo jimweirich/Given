@@ -1,8 +1,8 @@
 module Given
   module DSL
 
-    def Given(*args)
-      @given_level = _given_level + 1
+    def Given(*args, &block)
+      _given_levels.push(eval("__LINE__", block))
       @given_setups ||= []
       @given_invariants ||= []
       @given_when = lambda { }
@@ -14,7 +14,7 @@ module Given
       @given_setups = old_setups
       @given_invariants = old_invariants
       @given_when = lambda { }
-      @given_level -= 1
+      _given_levels.pop
     end
 
     def When(&when_code)
@@ -22,26 +22,32 @@ module Given
       @given_when = when_code
     end
 
+    def _given_test_name(setup_codes, when_code, then_code)
+      tags = _given_levels.map { |ln| "G#{ln}" }
+      tags << ("W" + eval("__LINE__", when_code).to_s)
+      if then_code
+        tags << ("T" + eval("__LINE__", then_code).to_s)
+      end
+      "test__#{tags.join('_')}_"
+    end
+
     def _given_make_test_method(then_code, exception_class)
-      @given_counter ||= 0
-      @given_counter += 1
       setups = @given_setups
       when_code = @given_when
       invariant_codes = @given_invariants
-      define_method "test_given__#{@given_counter}" do
+      define_method _given_test_name(setups, when_code, then_code) do
         setups.each do |s| send s end
-        if exception_class
+        if exception_class.nil?
+          instance_eval(&when_code)
+        else
           begin
             instance_eval(&when_code)
             given_assert(lambda { false })
           rescue exception_class => ex
             @exception = ex
-            given_assert(then_code) unless then_code.nil?
           end
-        else
-          instance_eval(&when_code)
-          given_assert(then_code)
         end
+        given_assert(then_code) unless then_code.nil?
         invariant_codes.each do |inv|
           given_assert(inv)
         end
@@ -63,13 +69,13 @@ module Given
       @given_invariants += [block]
     end
 
-    def _given_level
-      @given_level ||= 0
+    def _given_levels
+      @given_levels ||= []
     end
 
     def _given_must_have_given_context(clause)
       fail UsageError, "A #{clause} clause must be inside a given block" if
-        _given_level <= 0
+        _given_levels.size <= 0
     end
   end
 end

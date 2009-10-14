@@ -1,6 +1,8 @@
 module Given
   module DSL
 
+    private
+
     def Given(*args, &block)
       _given_levels.push(eval("__LINE__", block))
       @given_setups ||= []
@@ -20,6 +22,32 @@ module Given
     def When(&when_code)
       _given_must_have_given_context("When")
       @given_when = when_code
+    end
+
+    def Then(&then_code)
+      _given_must_have_given_context("Then")
+      _given_make_test_method(then_code, nil)
+    end
+
+    def Fails(exception_class, &fail_code)
+      _given_must_have_given_context("Fails")
+      _given_make_test_method(fail_code, exception_class)
+    end
+
+    def Invariant(&block)
+      @given_invariants ||= []
+      @given_invariants += [block]
+    end
+
+    # Internal Use Methods -------------------------------------------
+
+    def _given_levels
+      @given_levels ||= []
+    end
+
+    def _given_must_have_given_context(clause)
+      fail UsageError, "A #{clause} clause must be inside a given block" if
+        _given_levels.size <= 0
     end
 
     def _given_test_name(setup_codes, when_code, then_code)
@@ -52,30 +80,6 @@ module Given
           given_assert(inv)
         end
       end
-    end
-
-    def Then(&then_code)
-      _given_must_have_given_context("Then")
-      _given_make_test_method(then_code, nil)
-    end
-
-    def Fails(exception_class, &fail_code)
-      _given_must_have_given_context("Fails")
-      _given_make_test_method(fail_code, exception_class)
-    end
-
-    def Invariant(&block)
-      @given_invariants ||= []
-      @given_invariants += [block]
-    end
-
-    def _given_levels
-      @given_levels ||= []
-    end
-
-    def _given_must_have_given_context(clause)
-      fail UsageError, "A #{clause} clause must be inside a given block" if
-        _given_levels.size <= 0
     end
   end
 end

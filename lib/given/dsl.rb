@@ -74,14 +74,14 @@ module Given
         else
           begin
             instance_eval(&when_code)
-            given_assert(lambda { false })
+            given_assert("XXX", lambda { false })
           rescue exception_class => ex
             @exception = ex
           end
         end
-        given_assert(then_code) unless then_code.nil?
+        given_assert("Then", then_code) unless then_code.nil?
         invariant_codes.each do |inv|
-          given_assert(inv)
+          given_assert("Invariant", inv)
         end
       end
     end

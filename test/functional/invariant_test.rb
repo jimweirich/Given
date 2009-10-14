@@ -47,6 +47,7 @@ class InvariantTest < GivenTestCase
     end
     assert ! tally.passed?
     assert_equal 2, tally.failure_count
+    assert_match(/Invariant Condition/, failure_message(tally))
   end
 
   def test_invariants_run_after_given_setup

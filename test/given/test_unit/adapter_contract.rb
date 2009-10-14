@@ -12,19 +12,19 @@ class AdapterTest < Given::Contract
   end
 
   Given do
-    When { given_assert(lambda { true }) }
+    When { given_assert("Then", lambda { true }) }
     Then { @assertion_counted }
 
     When {
       @line = __LINE__ + 1
-      given_assert(lambda { false })
+      given_assert("Then", lambda { false })
     }
     Fails(Test::Unit::AssertionFailedError) {
       @exception.message =~ /#{__FILE__}:#{@line}/
     }
 
     When {
-      given_assert(lambda { fail "OUCH" })
+      given_assert("Then", lambda { fail "OUCH" })
     }
     Fails(RuntimeError) {
       @exception.message == "OUCH"

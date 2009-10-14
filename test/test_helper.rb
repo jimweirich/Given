@@ -5,6 +5,12 @@ require 'given/test_unit/adapter'
 class GivenTestCase < Test::Unit::TestCase
   private
 
+  # Reach inside the tally object and return the first failure message
+  def failure_message(tally)
+    failures = tally.instance_eval { @failures }
+    failures.first.instance_eval { @message }
+  end
+
   def assert_all_pass(run_count=nil, &block)
     tally = run_tests(&block)
     assert tally.passed?, tally.inspect

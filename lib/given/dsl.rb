@@ -74,7 +74,7 @@ module Given
         else
           begin
             instance_eval(&when_code)
-            given_assert("XXX", lambda { false })
+            given_failure("Expected #{exception_class} Exception")
           rescue exception_class => ex
             @exception = ex
           end

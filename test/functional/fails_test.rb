@@ -43,11 +43,12 @@ class FailsTest < GivenTestCase
   def test_fails_without_expected_failure_is_not_ok
     tally = run_tests do
       Given do
-        When { noop }
+        When { }
         Fails(RuntimeError)
       end
     end
     assert ! tally.passed?
+    assert_match(/Expected RuntimeError Exception/i, failure_message(tally))
   end
 
   def test_invariants_run_after_failure

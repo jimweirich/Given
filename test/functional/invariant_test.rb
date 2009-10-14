@@ -38,7 +38,9 @@ class InvariantTest < GivenTestCase
   end
 
   def test_failing_global_invariants_fail_all_thens
+    line = 0
     tally = run_tests do
+      line = __LINE__ + 1
       Invariant { false }
       Given do
         Then { true }
@@ -48,6 +50,7 @@ class InvariantTest < GivenTestCase
     assert ! tally.passed?
     assert_equal 2, tally.failure_count
     assert_match(/Invariant Condition/, failure_message(tally))
+    assert_match(/:#{line}/, failure_message(tally))
   end
 
   def test_invariants_run_after_given_setup

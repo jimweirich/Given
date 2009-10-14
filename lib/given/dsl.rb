@@ -28,6 +28,7 @@ module Given
       _given_must_have_context("Then")
       _given_make_test_method("Then", then_code, nil)
     end
+    alias And Then
 
     def Fails(exception_class, &fail_code)
       _given_must_have_context("Fails")

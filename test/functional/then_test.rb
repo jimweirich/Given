@@ -38,6 +38,16 @@ class ThenTest < GivenTestCase
     end
   end
 
+  def test_and_is_an_alias_for_then
+    assert_all_pass(3) do
+      Given do
+        Then { true }
+        And { true }
+        And { true }
+      end
+    end
+  end
+
   def test_multiple_thens_with_tested_givens_create_multiple_tests
     assert_all_pass(3) do
       Given do

@@ -74,7 +74,7 @@ module Given
         else
           begin
             instance_eval(&when_code)
-            given_failure("Expected #{exception_class} Exception")
+            given_failure("Expected #{exception_class} Exception", when_code)
           rescue exception_class => ex
             @exception = ex
           end

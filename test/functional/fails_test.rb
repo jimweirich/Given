@@ -41,14 +41,17 @@ class FailsTest < GivenTestCase
   end
 
   def test_fails_without_expected_failure_is_not_ok
+    line = 0
     tally = run_tests do
       Given do
+        line = __LINE__ + 1
         When { }
         Fails(RuntimeError)
       end
     end
     assert ! tally.passed?
     assert_match(/Expected RuntimeError Exception/i, failure_message(tally))
+    assert_match(/:#{line}/, failure_message(tally))
   end
 
   def test_invariants_run_after_failure

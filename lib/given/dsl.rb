@@ -38,6 +38,7 @@ module Given
     alias And Then
 
     def FailsWith(exception_class, &fail_code)
+      _given_must_have_context("FailsWith")
       @_given_exception_class = exception_class
       _given_make_test_method("FailsWith", lambda { true }, exception_class)
       fail_code.call if fail_code

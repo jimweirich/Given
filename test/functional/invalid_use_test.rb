@@ -38,4 +38,23 @@ class InvalidUseTest < GivenTestCase
     end
     assert_equal "A When clause must be inside a given block", ex.message
   end
+
+  def test_fails_with_must_be_inside_given
+    ex = assert_raise(Given::UsageError) do
+      run_tests do
+        FailsWith(RuntimeError)
+      end
+    end
+    assert_equal "A FailsWith clause must be inside a given block", ex.message
+  end
+
+  def test_fails_with_must_be_inside_given_part_2
+    ex = assert_raise(Given::UsageError) do
+      run_tests do
+        Given do end
+        FailsWith(RuntimeError)
+      end
+    end
+    assert_equal "A FailsWith clause must be inside a given block", ex.message
+  end
 end

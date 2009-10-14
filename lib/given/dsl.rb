@@ -1,38 +1,7 @@
+require 'given/anonymous_code'
+require 'given/code'
+
 module Given
-  class AnonymousCode
-    def initialize(mark, block)
-      @mark = mark
-      @block = block
-    end
-    
-    def run(context)
-      context.instance_eval(&@block)
-    end
-
-    def line_marker
-      nil
-    end
-
-    def file_line
-      nil
-    end
-  end
-
-  DO_NOTHING = AnonymousCode.new('W', lambda { })
-  TRUE_CODE  = AnonymousCode.new('T', lambda { true })
-
-  class Code < AnonymousCode
-    def line_marker
-      "%s%d" % [@mark, eval("__LINE__", @block)]
-    end
-
-    def file_line
-      file = eval("__FILE__", @block)
-      line = eval("__LINE__", @block)
-      "#{file}:#{line}"
-    end
-  end
-
   module DSL
     module TestHelper
       def exception
@@ -84,10 +53,6 @@ module Given
     end
 
     # Internal Use Methods -------------------------------------------
-
-    def _given_line(block)
-      eval("__LINE__", block)
-    end
 
     def _given_levels
       @_given_levels ||= []

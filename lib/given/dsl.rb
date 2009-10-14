@@ -28,6 +28,7 @@ module Given
     def When(&when_code)
       _given_must_have_context("When")
       @_given_when_code = when_code
+      @_given_exception_class = nil
     end
 
     def Then(&then_code)
@@ -40,8 +41,6 @@ module Given
       @_given_exception_class = exception_class
       _given_make_test_method("FailsWith", lambda { true }, exception_class)
       fail_code.call if fail_code
-    ensure
-      @_given_exception_class = nil
     end
 
     def Invariant(&block)

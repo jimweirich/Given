@@ -15,10 +15,9 @@ class FailsTest < GivenTestCase
     assert_all_pass do
       Given do
         When { fail "OUCH" }
-        FailsWith(RuntimeError) do
-          Then { exception.class == RuntimeError }
-          And  { exception.message == "OUCH" }
-        end
+        FailsWith(RuntimeError)
+        Then { exception.class == RuntimeError }
+        And  { exception.message == "OUCH" }
       end
     end
   end
@@ -28,11 +27,10 @@ class FailsTest < GivenTestCase
     tally = run_tests do
       Given do
         When { fail "OUCH" }
-        FailsWith(RuntimeError) {
-          Then { exception.class == RuntimeError }
-          line = __LINE__ + 1
-          And  { exception.message == "XXXX" }
-        }
+        FailsWith(RuntimeError)
+        Then { exception.class == RuntimeError }
+        line = __LINE__ + 1
+        And  { exception.message == "XXXX" }
       end
     end
     assert ! tally.passed?

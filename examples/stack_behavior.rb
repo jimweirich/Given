@@ -13,7 +13,8 @@ class StackBehavior < Given::Contract
     Then { @stack.top == :an_item }
 
     When { @stack.pop }
-    Fails(Stack::UsageError) { @exception.message =~ /empty/ }
+    FailsWith(Stack::UsageError)
+    Then { exception.message =~ /empty/ }
   end
 
   Given(:stack_with_two_items) {

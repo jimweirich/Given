@@ -94,7 +94,7 @@ module Given
               when_code)
           end
         end
-        given_assert(clause, then_code) unless then_code.nil?
+        given_assert(clause, then_code)
         invariant_codes.each do |inv|
           given_assert("Invariant", inv)
         end

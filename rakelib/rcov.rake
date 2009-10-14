@@ -15,9 +15,8 @@ begin
       '--sort coverage'
     ] + FileList['rakelib/*.rake'].pathmap("-x%p")
     t.test_files = FileList[
-      'test/lib/*_test.rb',
-      'test/contrib/*_test.rb',
-      'test/functional/*_test.rb'
+      'test/functional/*_test.rb',
+      'test/given/*_contract.rb',
     ]
     t.output_dir = 'coverage'
     t.verbose = true

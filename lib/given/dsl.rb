@@ -89,7 +89,7 @@ module Given
             @_given_exception = ex
           end
         end
-        given_assert(clause, then_code || when_code) unless then_code.nil?
+        given_assert(clause, then_code) unless then_code.nil?
         invariant_codes.each do |inv|
           given_assert("Invariant", inv)
         end

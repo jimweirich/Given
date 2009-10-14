@@ -4,67 +4,71 @@ module Given
     private
 
     def Given(*args, &block)
-      _given_levels.push(eval("__LINE__", block))
-      @given_setups ||= []
-      @given_invariants ||= []
-      @given_when = lambda { }
-      old_setups = @given_setups
-      old_invariants = @given_invariants
-      @given_setups += args
+      _given_levels.push(_given_line(block))
+      @_given_setup_codes ||= []
+      @_given_invariant_codes ||= []
+      @_given_when_code = lambda { }
+      old_setups = @_given_setup_codes
+      old_invariants = @_given_invariant_codes
+      @_given_setup_codes += args
       yield
     ensure
-      @given_setups = old_setups
-      @given_invariants = old_invariants
-      @given_when = lambda { }
+      @_given_setup_codes = old_setups
+      @_given_invariant_codes = old_invariants
+      @_given_when_code = lambda { }
       _given_levels.pop
     end
 
     def When(&when_code)
-      _given_must_have_given_context("When")
-      @given_when = when_code
+      _given_must_have_context("When")
+      @_given_when_code = when_code
     end
 
     def Then(&then_code)
-      _given_must_have_given_context("Then")
+      _given_must_have_context("Then")
       _given_make_test_method(then_code, nil)
     end
 
     def Fails(exception_class, &fail_code)
-      _given_must_have_given_context("Fails")
+      _given_must_have_context("Fails")
       _given_make_test_method(fail_code, exception_class)
     end
 
     def Invariant(&block)
-      @given_invariants ||= []
-      @given_invariants += [block]
+      @_given_invariant_codes ||= []
+      @_given_invariant_codes += [block]
     end
 
     # Internal Use Methods -------------------------------------------
 
-    def _given_levels
-      @given_levels ||= []
+    def _given_line(block)
+      eval("__LINE__", block)
     end
 
-    def _given_must_have_given_context(clause)
+    def _given_levels
+      @_given_levels ||= []
+    end
+
+    def _given_must_have_context(clause)
       fail UsageError, "A #{clause} clause must be inside a given block" if
         _given_levels.size <= 0
     end
 
     def _given_test_name(setup_codes, when_code, then_code)
       tags = _given_levels.map { |ln| "G#{ln}" }
-      tags << ("W" + eval("__LINE__", when_code).to_s)
+      tags << ("W" + _given_line(when_code).to_s)
       if then_code
-        tags << ("T" + eval("__LINE__", then_code).to_s)
+        tags << ("T" + _given_line(then_code).to_s)
       end
       "test__#{tags.join('_')}_"
     end
 
     def _given_make_test_method(then_code, exception_class)
-      setups = @given_setups
-      when_code = @given_when
-      invariant_codes = @given_invariants
-      define_method _given_test_name(setups, when_code, then_code) do
-        setups.each do |s| send s end
+      setup_codes = @_given_setup_codes
+      when_code = @_given_when_code
+      invariant_codes = @_given_invariant_codes
+      define_method _given_test_name(setup_codes, when_code, then_code) do
+        setup_codes.each do |s| send s end
         if exception_class.nil?
           instance_eval(&when_code)
         else

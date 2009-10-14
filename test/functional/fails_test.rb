@@ -24,9 +24,11 @@ class FailsTest < GivenTestCase
   end
 
   def test_failure_block_must_be_true
+    line = 0
     tally = run_tests do
       Given do
         When { fail "OUCH" }
+        line = __LINE__ + 1
         Fails(RuntimeError) { 
           @exception.class == RuntimeError &&
           @exception.message == "XXXX"
@@ -34,6 +36,8 @@ class FailsTest < GivenTestCase
       end
     end
     assert ! tally.passed?
+    assert_match(/Fails Condition Failed/, failure_message(tally))
+    assert_match(/:#{line}/, failure_message(tally))
   end
 
   def test_fails_without_expected_failure_is_not_ok

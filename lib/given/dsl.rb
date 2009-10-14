@@ -26,12 +26,12 @@ module Given
 
     def Then(&then_code)
       _given_must_have_context("Then")
-      _given_make_test_method(then_code, nil)
+      _given_make_test_method("Then", then_code, nil)
     end
 
     def Fails(exception_class, &fail_code)
       _given_must_have_context("Fails")
-      _given_make_test_method(fail_code, exception_class)
+      _given_make_test_method("Fails", fail_code, exception_class)
     end
 
     def Invariant(&block)
@@ -63,7 +63,7 @@ module Given
       "test__#{tags.join('_')}_"
     end
 
-    def _given_make_test_method(then_code, exception_class)
+    def _given_make_test_method(clause, then_code, exception_class)
       setup_codes = @_given_setup_codes
       when_code = @_given_when_code
       invariant_codes = @_given_invariant_codes
@@ -79,7 +79,7 @@ module Given
             @exception = ex
           end
         end
-        given_assert("Then", then_code) unless then_code.nil?
+        given_assert(clause, then_code) unless then_code.nil?
         invariant_codes.each do |inv|
           given_assert("Invariant", inv)
         end

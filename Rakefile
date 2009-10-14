@@ -9,6 +9,7 @@ task :tu => "test:units"
 task :tf => "test:functionals"
 
 EXAMPLE_FILES = FileList['examples/*_behavior.rb']
+desc "Run Examples"
 task :examples do
   ruby "-I.:lib #{EXAMPLE_FILES}"
 end

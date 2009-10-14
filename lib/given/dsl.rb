@@ -23,7 +23,7 @@ module Given
 
   class Code < AnonymousCode
     def line_marker
-      @mark + eval("__LINE__", @block).to_s
+      "%s%d" % [@mark, eval("__LINE__", @block)]
     end
 
     def file_line
@@ -104,7 +104,9 @@ module Given
       if then_code
         tags << then_code.line_marker
       end
-      "test__#{tags.join('_')}_"
+      tags.compact!
+      sort = "%05d" % tags.last[1..-1].to_i
+      "test__#{sort}_#{tags.join('_')}_"
     end
 
     def _given_make_test_method(clause, then_code, exception_class)

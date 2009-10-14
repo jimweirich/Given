@@ -1,4 +1,38 @@
 module Given
+  class AnonymousCode
+    def initialize(mark, block)
+      @mark = mark
+      @block = block
+    end
+    
+    def run(context)
+      context.instance_eval(&@block)
+    end
+
+    def line_marker
+      nil
+    end
+
+    def file_line
+      nil
+    end
+  end
+
+  DO_NOTHING = AnonymousCode.new('W', lambda { })
+  TRUE_CODE  = AnonymousCode.new('T', lambda { true })
+
+  class Code < AnonymousCode
+    def line_marker
+      @mark + eval("__LINE__", @block).to_s
+    end
+
+    def file_line
+      file = eval("__FILE__", @block)
+      line = eval("__LINE__", @block)
+      "#{file}:#{line}"
+    end
+  end
+
   module DSL
     module TestHelper
       def exception
@@ -9,10 +43,10 @@ module Given
     private
 
     def Given(*args, &block)
-      _given_levels.push(_given_line(block))
+      _given_levels.push(Code.new('G', block))
       @_given_setup_codes ||= []
       @_given_invariant_codes ||= []
-      @_given_when_code = lambda { }
+      @_given_when_code = DO_NOTHING
       @_given_exception_class = nil
       old_setups = @_given_setup_codes
       old_invariants = @_given_invariant_codes
@@ -21,32 +55,32 @@ module Given
     ensure
       @_given_setup_codes = old_setups
       @_given_invariant_codes = old_invariants
-      @_given_when_code = lambda { }
+      @_given_when_code = DO_NOTHING
       _given_levels.pop
     end
 
     def When(&when_code)
       _given_must_have_context("When")
-      @_given_when_code = when_code
+      @_given_when_code = Code.new('W', when_code)
       @_given_exception_class = nil
     end
 
     def Then(&then_code)
       _given_must_have_context("Then")
-      _given_make_test_method("Then", then_code, @_given_exception_class)
+      _given_make_test_method("Then", Code.new('T', then_code), @_given_exception_class)
     end
     alias And Then
 
     def FailsWith(exception_class, &fail_code)
       _given_must_have_context("FailsWith")
       @_given_exception_class = exception_class
-      _given_make_test_method("FailsWith", lambda { true }, exception_class)
+      _given_make_test_method("FailsWith", TRUE_CODE, exception_class)
       fail_code.call if fail_code
     end
 
     def Invariant(&block)
       @_given_invariant_codes ||= []
-      @_given_invariant_codes += [block]
+      @_given_invariant_codes += [Code.new('I', block)]
     end
 
     # Internal Use Methods -------------------------------------------
@@ -65,10 +99,10 @@ module Given
     end
 
     def _given_test_name(setup_codes, when_code, then_code)
-      tags = _given_levels.map { |ln| "G#{ln}" }
-      tags << ("W" + _given_line(when_code).to_s)
+      tags = _given_levels.map { |code| code.line_marker }
+      tags << when_code.line_marker
       if then_code
-        tags << ("T" + _given_line(then_code).to_s)
+        tags << then_code.line_marker
       end
       "test__#{tags.join('_')}_"
     end
@@ -80,10 +114,10 @@ module Given
       define_method _given_test_name(setup_codes, when_code, then_code) do
         setup_codes.each do |s| send s end
         if exception_class.nil?
-          instance_eval(&when_code)
+          when_code.run(self)
         else
           begin
-            instance_eval(&when_code)
+            when_code.run(self)
             given_failure("Expected #{exception_class} Exception", when_code)
           rescue exception_class => ex
             @_given_exception = ex

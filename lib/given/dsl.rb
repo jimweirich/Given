@@ -87,6 +87,11 @@ module Given
             given_failure("Expected #{exception_class} Exception", when_code)
           rescue exception_class => ex
             @_given_exception = ex
+          rescue Exception => ex
+            @_given_exception = ex
+            given_failure("Expected #{exception_class} Exception, " +
+              "but got #{exception.class}",
+              when_code)
           end
         end
         given_assert(clause, then_code) unless then_code.nil?

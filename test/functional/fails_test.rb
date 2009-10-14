@@ -11,7 +11,7 @@ class FailsTest < GivenTestCase
     end
   end
 
-  def test_actual_exception_is_passed_to_block
+  def test_actual_exception_is_available
     assert_all_pass do
       Given do
         When { fail "OUCH" }
@@ -51,6 +51,29 @@ class FailsTest < GivenTestCase
     end
     assert ! tally.passed?
     assert_match(/Expected RuntimeError Exception/i, failure_message(tally))
+    assert_match(/:#{line}/, failure_message(tally))
+  end
+
+  class ExpectedError < RuntimeError
+  end
+
+  class ActualError < RuntimeError
+  end
+
+  def test_fails_with_unexpected_failure_is_not_ok
+    line = 0
+    tally = run_tests do
+      Given do
+        line = __LINE__ + 1
+        When { fail ActualError }
+        FailsWith(ExpectedError)
+      end
+    end
+    assert ! tally.passed?
+    assert_match(/Expected FailsTest::ExpectedError Exception/i,
+      failure_message(tally))
+    assert_match(/but got FailsTest::ActualError/i,
+      failure_message(tally))
     assert_match(/:#{line}/, failure_message(tally))
   end
 

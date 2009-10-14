@@ -5,6 +5,7 @@ require 'given/test_unit/adapter'
 module Given
   class Contract < Test::Unit::TestCase
     extend Given::DSL
+    include Given::DSL::TestHelper
     include Given::TestUnit::Adapter
 
     def test_DUMMY

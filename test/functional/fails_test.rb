@@ -6,7 +6,7 @@ class FailsTest < GivenTestCase
     assert_all_pass do
       Given do
         When { fail "OUCH" }
-        Fails(RuntimeError)
+        FailsWith(RuntimeError)
       end
     end
   end
@@ -15,10 +15,10 @@ class FailsTest < GivenTestCase
     assert_all_pass do
       Given do
         When { fail "OUCH" }
-        Fails(RuntimeError) {
-          @exception.class == RuntimeError &&
-          @exception.message == "OUCH"
-        }          
+        FailsWith(RuntimeError) do
+          Then { exception.class == RuntimeError }
+          And  { exception.message == "OUCH" }
+        end
       end
     end
   end
@@ -28,15 +28,15 @@ class FailsTest < GivenTestCase
     tally = run_tests do
       Given do
         When { fail "OUCH" }
-        line = __LINE__ + 1
-        Fails(RuntimeError) { 
-          @exception.class == RuntimeError &&
-          @exception.message == "XXXX"
-        }          
+        FailsWith(RuntimeError) {
+          Then { exception.class == RuntimeError }
+          line = __LINE__ + 1
+          And  { exception.message == "XXXX" }
+        }
       end
     end
     assert ! tally.passed?
-    assert_match(/Fails Condition Failed/, failure_message(tally))
+    assert_match(/Then Condition Failed/, failure_message(tally))
     assert_match(/:#{line}/, failure_message(tally))
   end
 
@@ -46,7 +46,7 @@ class FailsTest < GivenTestCase
       Given do
         line = __LINE__ + 1
         When { }
-        Fails(RuntimeError)
+        FailsWith(RuntimeError)
       end
     end
     assert ! tally.passed?
@@ -60,7 +60,7 @@ class FailsTest < GivenTestCase
         Invariant { false }
 
         When { fail "OUCH" }
-        Fails(RuntimeError)
+        FailsWith(RuntimeError)
       end
     end
     assert ! tally.passed?

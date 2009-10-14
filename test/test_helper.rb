@@ -42,6 +42,7 @@ end
 class FauxTestCase
   include Test::Unit::Assertions
   include Test::Unit::Util::BacktraceFilter
+  include Given::DSL::TestHelper
   extend Given::DSL
   
   attr_reader :method_name

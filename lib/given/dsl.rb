@@ -1,5 +1,10 @@
 module Given
   module DSL
+    module TestHelper
+      def exception
+        @_given_exception
+      end
+    end
 
     private
 
@@ -8,6 +13,7 @@ module Given
       @_given_setup_codes ||= []
       @_given_invariant_codes ||= []
       @_given_when_code = lambda { }
+      @_given_exception_class = nil
       old_setups = @_given_setup_codes
       old_invariants = @_given_invariant_codes
       @_given_setup_codes += args
@@ -26,13 +32,16 @@ module Given
 
     def Then(&then_code)
       _given_must_have_context("Then")
-      _given_make_test_method("Then", then_code, nil)
+      _given_make_test_method("Then", then_code, @_given_exception_class)
     end
     alias And Then
 
-    def Fails(exception_class, &fail_code)
-      _given_must_have_context("Fails")
-      _given_make_test_method("Fails", fail_code, exception_class)
+    def FailsWith(exception_class, &fail_code)
+      @_given_exception_class = exception_class
+      _given_make_test_method("FailsWith", lambda { true }, exception_class)
+      fail_code.call if fail_code
+    ensure
+      @_given_exception_class = nil
     end
 
     def Invariant(&block)
@@ -77,7 +86,7 @@ module Given
             instance_eval(&when_code)
             given_failure("Expected #{exception_class} Exception", when_code)
           rescue exception_class => ex
-            @exception = ex
+            @_given_exception = ex
           end
         end
         given_assert(clause, then_code || when_code) unless then_code.nil?

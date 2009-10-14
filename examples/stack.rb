@@ -1,4 +1,7 @@
 class Stack
+  class UsageError < RuntimeError
+  end
+
   def initialize
     @items = []
   end
@@ -20,6 +23,7 @@ class Stack
   end
 
   def pop
+    fail UsageError, "Cannot pop an empty stack" if empty?
     @items.pop
   end
 end

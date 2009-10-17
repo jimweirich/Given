@@ -7,6 +7,11 @@ module Given
       def exception
         @_given_exception
       end
+
+      def given_check(ok, msg, args)
+        given_failure(msg % args) if ! ok
+        true
+      end
     end
 
     private

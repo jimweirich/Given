@@ -1,11 +1,17 @@
 require 'test/unit'
 
 module Given
+  def self.assertion_failed_exception
+    Test::Unit::AssertionFailedError
+  end
+
   module TestUnit
     module Adapter
-      def given_failure(message, code)
-        msg = "\n#{code.file_line} #{message}\n"
-        raise Test::Unit::AssertionFailedError.new(msg)
+      def given_failure(message, code=nil)
+        if code
+          message = "\n#{code.file_line} #{message}\n"
+        end
+        raise Test::Unit::AssertionFailedError.new(message)
       end
 
       def given_assert(clause, code)

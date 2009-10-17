@@ -2,7 +2,7 @@ require 'test/unit'
 require 'given/test_unit'
 require 'given/anonymous_code'
 
-class AnonymousCodeContract < Given::Contract
+class AnonymousCodeContract < Given::TestCase
   Given(:an_anonymous_code_snippet) do
     Then { @code.run(self) == :result }
     Then { @code.line_marker.nil? }

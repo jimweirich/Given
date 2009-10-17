@@ -1,7 +1,7 @@
 require 'test/unit'
 require 'given/test_unit'
 
-class AnonymousCodeContract < Given::Contract
+class AnonymousCodeContract < Given::TestCase
   Given(:an_anonymous_code_snippet) do
     Then { @code.run = :result }
   end

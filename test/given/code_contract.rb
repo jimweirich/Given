@@ -2,7 +2,7 @@ require 'test/unit'
 require 'given/test_unit'
 require 'given/code'
 
-class CodeContract < Given::Contract
+class CodeContract < Given::TestCase
   EXPECTED_LINE_MARKER_PATTERN = /^T\d+$/
   EXPECTED_FILE_LINE_PATTERN = /code_contract\.rb:\d+$/
 

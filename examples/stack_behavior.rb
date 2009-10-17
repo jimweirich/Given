@@ -1,7 +1,7 @@
 require 'given/test_unit'
 require 'examples/stack'
 
-class StackBehavior < Given::Contract
+class StackBehavior < Given::TestCase
   Invariant { expect(@stack.depth) >= 0 }
   Invariant { expect(@stack.empty?) == (@stack.depth == 0) }
 

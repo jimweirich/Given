@@ -5,7 +5,7 @@ require 'given/test_unit'
 
 require 'given/expectation'
 
-class ExpectationContract < Given::Contract
+class ExpectationContract < Given::TestCase
   Given do
     Then { expect(1) == 1 }
     Then { expect(2) > 1 }

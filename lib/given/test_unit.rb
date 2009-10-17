@@ -3,7 +3,7 @@ require 'test/unit'
 require 'given/test_unit/adapter'
 
 module Given
-  class Contract < Test::Unit::TestCase
+  class TestCase < Test::Unit::TestCase
     extend Given::DSL
     include Given::DSL::TestHelper
     include Given::TestUnit::Adapter

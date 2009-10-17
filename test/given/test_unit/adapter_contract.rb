@@ -3,7 +3,7 @@
 require 'test/unit'
 require 'given/test_unit'
 
-class AdapterTest < Given::Contract
+class AdapterTest < Given::TestCase
   include Given::TestUnit::Adapter
 
   Code = Given::Code

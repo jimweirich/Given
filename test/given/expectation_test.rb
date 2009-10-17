@@ -6,10 +6,6 @@ require 'given/test_unit'
 require 'given/expectation'
 
 class ExpectationContract < Given::Contract
-  def expect(value)
-    Given::Expectation.new(value, self)
-  end
-
   Given do
     Then { expect(1) == 1 }
     Then { expect(2) > 1 }

@@ -12,6 +12,10 @@ module Given
         given_failure(msg % args) if ! ok
         true
       end
+
+      def expect(value)
+        Given::Expectation.new(value, self)
+      end
     end
 
     private

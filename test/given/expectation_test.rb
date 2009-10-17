@@ -26,6 +26,12 @@ class ExpectationContract < Given::Contract
   end
 
   Given do
+    When { expect([]).size }
+    FailsWith(Given::UsageError)
+    Then { expect(exception.message) =~ /x/ }
+  end
+
+  Given do
     Then { expect(1).not == 2 }
     Then { expect(2).not <= 1 }
     Then { expect(2).not < 1 }

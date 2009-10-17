@@ -73,6 +73,8 @@ module Given
         check(lambda { |value| value.send(sym, *args, &block) },
           "<%s> expected to %sbe %s",
           [method_name[0..-2]])
+      else
+        fail Given::UsageError.new("cannot expect anything about #{sym}")
       end
     end
   end

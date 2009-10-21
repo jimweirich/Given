@@ -39,6 +39,25 @@ class InvalidUseTest < GivenTestCase
     assert_equal "A When clause must be inside a given block", ex.message
   end
 
+  def test_mock_must_be_inside_given
+    ex = assert_raise(Given::UsageError) do
+      run_tests do
+        Mock {  }
+      end
+    end
+    assert_equal "A Mock clause must be inside a given block", ex.message
+  end
+
+  def test_mock_must_be_inside_given_part_2
+    ex = assert_raise(Given::UsageError) do
+      run_tests do
+        Given do end
+        Mock {  }
+      end
+    end
+    assert_equal "A Mock clause must be inside a given block", ex.message
+  end
+
   def test_fails_with_must_be_inside_given
     ex = assert_raise(Given::UsageError) do
       run_tests do

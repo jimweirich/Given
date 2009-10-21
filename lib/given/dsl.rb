@@ -25,6 +25,7 @@ module Given
       @_given_setup_codes ||= []
       @_given_invariant_codes ||= []
       @_given_when_code = DO_NOTHING
+      @_given_mock_codes = []
       @_given_exception_class = nil
       old_setups = @_given_setup_codes
       old_invariants = @_given_invariant_codes
@@ -40,7 +41,15 @@ module Given
     def When(&when_code)
       _given_must_have_context("When")
       @_given_when_code = Code.new('W', when_code)
+      @_given_mock_codes = []
+
       @_given_exception_class = nil
+    end
+
+    def Mock(&mock_code)
+      _given_must_have_context("Mock")
+      @_given_mock_codes << AnonymousCode.new(mock_code)
+      Then { true }
     end
 
     def Then(&then_code)
@@ -86,9 +95,11 @@ module Given
     def _given_make_test_method(clause, then_code, exception_class)
       setup_codes = @_given_setup_codes
       when_code = @_given_when_code
+      mock_codes = @_given_mock_codes
       invariant_codes = @_given_invariant_codes
       define_method _given_test_name(setup_codes, when_code, then_code) do
         setup_codes.each do |s| send s end
+        mock_codes.each do |m| m.run(self) end
         if exception_class.nil?
           when_code.run(self)
         else

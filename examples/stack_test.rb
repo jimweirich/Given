@@ -5,6 +5,10 @@ class StackBehavior < Given::TestCase
   Invariant { expect(@stack.depth) >= 0 }
   Invariant { expect(@stack.empty?) == (@stack.depth == 0) }
 
+  def empty_stack
+    @stack = Stack.new
+  end
+
   Given(:empty_stack) do
     Then { expect(@stack.depth) == 0 }
 
@@ -15,6 +19,12 @@ class StackBehavior < Given::TestCase
     When { @stack.pop }
     FailsWith(Stack::UsageError)
     Then { expect(exception.message) =~ /empty/ }
+  end
+
+  def stack_with_two_items
+    empty_stack
+    @stack.push(:bottom_item)
+    @stack.push(:top_item)
   end
 
   Given(:stack_with_two_items) {
@@ -33,14 +43,4 @@ class StackBehavior < Given::TestCase
     Then { expect(@result) == :bottom_item }
     Then { expect(@stack.depth) == 0 }
   }
-
-  def empty_stack
-    @stack = Stack.new
-  end
-
-  def stack_with_two_items
-    empty_stack
-    @stack.push(:bottom_item)
-    @stack.push(:top_item)
-  end
 end

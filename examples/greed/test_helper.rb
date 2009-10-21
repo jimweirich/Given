@@ -1,5 +1,2 @@
-require 'test/unit'
-require 'given/test_unit'
-
-$: << File.dirname(File.dirname(__FILE__))
+require File.expand_path(File.join(File.dirname(__FILE__), '../test_helper'))
 

@@ -3,7 +3,7 @@ require 'rake/testtask'
 
 CLOBBER.include("html")
 
-task :default => ["test:units", "test:functionals"]
+task :default => ["test:units", "test:functionals", :examples]
 
 task :tu => "test:units"
 task :tf => "test:functionals"

@@ -2,7 +2,7 @@ require 'test/test_helper'
 
 require 'given'
 
-class MockTest < GivenTestCase
+class ExpectsTest < GivenTestCase
   def test_mocks_are_called_before_when
     assert_all_pass do
       def trace
@@ -10,7 +10,7 @@ class MockTest < GivenTestCase
       end
       Given do
         When { trace << :when }
-        Mock { trace << :mock }
+        Expects { trace << :mock }
         Then { expect(trace) == [:mock, :when] }
       end
     end
@@ -19,7 +19,7 @@ class MockTest < GivenTestCase
   def test_mocks_without_when_still_runs_a_test
     assert_all_pass do
       Given do
-        Mock { }
+        Expects { }
       end
     end
   end
@@ -30,7 +30,7 @@ class MockTest < GivenTestCase
         @trace ||= []
       end
       Given do
-        Mock { trace << :m1 }
+        Expects { trace << :m1 }
 
         When { }
         Then { expect(trace) == [] }
@@ -45,8 +45,8 @@ class MockTest < GivenTestCase
       end
       Given do
         When { }
-        Mock { trace << :m1 }
-        Mock { trace << :m2 }
+        Expects { trace << :m1 }
+        Expects { trace << :m2 }
         Then { expect(trace) == [:m1, :m2] }
       end
     end

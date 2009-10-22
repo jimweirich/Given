@@ -46,7 +46,7 @@ module Given
       @_given_exception_class = nil
     end
 
-    def Mock(&mock_code)
+    def Expects(&mock_code)
       _given_must_have_context("Mock")
       @_given_mock_codes << AnonymousCode.new(mock_code)
       Then { true }

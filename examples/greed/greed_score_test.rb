@@ -3,6 +3,16 @@ require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
 require 'greed/score'
 
 class GreedScoreTest < Given::TestCase
+
+  Invariant { @score.bust? == (@score.points == 0) }
+  Invariant {
+    if @score.unused == 0
+      expect(@score.remaining) == 5
+    else
+      expect(@score.remaining) == @score.unused
+    end
+  }
+  
   def points(dice)
     @score = Greed::Score.for(dice)
     expect(@score.points)
@@ -44,6 +54,20 @@ class GreedScoreTest < Given::TestCase
     Then { expect(@score).not == Greed::Score.new(1, 0) }
     Then { expect(@score).not == Greed::Score.new(0, 1) }
     Then { expect(@score).not == :non_score }
+  end
+
+  Given(:a_zero_score) do
+    Then { expect(@score + 0) == 0 }
+    Then { expect(@score + 100) == 0 }
+  end
+
+  def a_100_point_score
+    @score = Greed::Score.new(100, 4)
+  end
+
+  Given(:a_100_point_score) do
+    Then { expect(@score + 0) == 100 }
+    Then { expect(@score + 200) == 300 }
   end
 
 end

@@ -50,6 +50,18 @@ module Greed
         unused == other.unused
     end
 
+    def remaining
+      unused == 0 ? 5 : unused
+    end
+
+    def bust?
+      points == 0
+    end
+
+    def +(previous_turn_score)
+      bust? ? 0 : previous_turn_score + points
+    end
+
     def score(roll)
       (1..6).each do |face|
         score_face(count_faces(face, roll), face)

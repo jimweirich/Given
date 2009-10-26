@@ -42,7 +42,7 @@ class InvalidUseTest < GivenTestCase
   def test_mock_must_be_inside_given
     ex = assert_raise(Given::UsageError) do
       run_tests do
-        Expects {  }
+        Expecting {  }
       end
     end
     assert_equal "A Mock clause must be inside a given block", ex.message
@@ -52,7 +52,7 @@ class InvalidUseTest < GivenTestCase
     ex = assert_raise(Given::UsageError) do
       run_tests do
         Given do end
-        Expects {  }
+        Expecting {  }
       end
     end
     assert_equal "A Mock clause must be inside a given block", ex.message

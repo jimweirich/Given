@@ -30,7 +30,7 @@ class TurnerTest < Given::TestCase
 
   Given(:a_turner_with_a_player, :a_bust_roll) do
     When { @turner.take_turn(400) }
-    Expects do
+    Expecting do
       @player.should_receive(:start_turn).once.with(0, 400)
       @player.should_receive(:roll_again?).never
       @player.should_receive(:end_turn).once.with(0)
@@ -39,7 +39,7 @@ class TurnerTest < Given::TestCase
 
   Given(:a_turner_with_a_player, :a_good_roll, :a_bust_roll) do
     When { @turner.take_turn(400) }
-    Expects do
+    Expecting do
       @player.should_receive(:start_turn).once.with(0, 400)
       @player.should_receive(:roll_again?).once.with(Score.new(100, 4)).and_return(true)
       @player.should_receive(:end_turn).once.with(0)
@@ -48,7 +48,7 @@ class TurnerTest < Given::TestCase
 
   Given(:a_turner_with_a_player, :a_good_roll, :a_bust_roll) do
     When { @turner.take_turn(400) }
-    Expects do
+    Expecting do
       @player.should_receive(:start_turn).once.with(0, 400)
       @player.should_receive(:roll_again?).once.with(Score.new(100, 4)).and_return(true)
       @player.should_receive(:end_turn).once.with(0)
@@ -58,7 +58,7 @@ class TurnerTest < Given::TestCase
   # Goal "Show that a player who stops after a good roll gets the score"
   Given(:a_turner_with_a_player, :a_good_roll, :a_bust_roll) do
     When { @turner.take_turn(400) }
-    Expects do
+    Expecting do
       @player.should_receive(:start_turn).once.with(0, 400)
       @player.should_receive(:roll_again?).once.with(Score.new(100, 4)).and_return(false)
       @player.should_receive(:end_turn).once.with(100)
@@ -67,7 +67,7 @@ class TurnerTest < Given::TestCase
 
   Given(:a_turner_with_a_player, :a_good_roll, :a_good_roll, :a_bust_roll) do
     When { @turner.take_turn(400) }
-    Expects do
+    Expecting do
       @player.should_receive(:start_turn).once.with(0, 400)
       @player.should_receive(:roll_again?).once.with(Score.new(100, 4)).and_return(true)
       @player.should_receive(:roll_again?).once.with(Score.new(100, 3)).and_return(false)
@@ -82,7 +82,7 @@ class TurnerTest < Given::TestCase
   #Goal "Show that a turn ends when roll_again? returns false."
   Given(:a_turner_with_a_player, :two_good_rolls, :a_bust_roll) do
     When { @turner.take_turn(400) }
-    Expects do
+    Expecting do
       @player.should_receive(:start_turn).once.with(0, 400)
       @player.should_receive(:roll_again?).once.with(Score.new(100, 4)).and_return(true)
       @player.should_receive(:roll_again?).once.with(Score.new(100, 3)).and_return(false)
@@ -97,7 +97,7 @@ class TurnerTest < Given::TestCase
   # Goal "Show that scoring all the dice resets number rolled to 5.
   Given(:a_turner_with_a_player, :six_good_rolls, :a_bust_roll) do
     When { @turner.take_turn(400) }
-    Expects do
+    Expecting do
       @player.should_receive(:start_turn).once.with(0, 400)
       @player.should_receive(:roll_again?).and_return(true).times(5)
       @player.should_receive(:roll_again?).and_return(false)

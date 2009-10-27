@@ -46,6 +46,10 @@ class ExpectationContract < Given::TestCase
     FailsWith(Given.assertion_failed_exception)
     Then { expect(exception.message) =~ /<1> expected to be equal to.*<2>/m }
 
+    When { expect([1,2]) == [1,3] }
+    FailsWith(Given.assertion_failed_exception)
+    Then { expect(exception.message) =~ /<\[1, 2\]> expected to be equal to.*<\[1, 3\]>/m }
+
     When { expect(1).not == 1 }
     FailsWith(Given.assertion_failed_exception)
     Then { expect(exception.message) =~ /<1> expected to not be equal to.*<1>/m }
@@ -68,7 +72,7 @@ class ExpectationContract < Given::TestCase
     
     When { expect("abc") =~ /^x/ }
     FailsWith(Given.assertion_failed_exception)
-    Then { expect(exception.message) =~ /<abc> expected to be matched by.*\^x/m }
+    Then { expect(exception.message) =~ /<"abc"> expected to be matched by.*\^x/m }
 
     When { expect(1).nil? }
     FailsWith(Given.assertion_failed_exception)
@@ -76,8 +80,7 @@ class ExpectationContract < Given::TestCase
 
     When { expect([1]).empty? }
     FailsWith(Given.assertion_failed_exception)
-    Then { expect(exception.message) =~ /<1> expected to be empty\.?$/m }
-
+    Then { expect(exception.message) =~ /<\[1\]> expected to be empty\.?$/m }
   end
 
 end

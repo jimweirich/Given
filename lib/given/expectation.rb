@@ -17,7 +17,9 @@ module Given
 
     def check(condition, msg, *args)
       bool = evaluate_condition(&condition)
-      @test_case.given_check(bool, msg, [@value, twist] + args)
+      @test_case.given_check(bool,
+        msg,
+        [@value.inspect, twist] + args)
       true
     end
 
@@ -29,37 +31,37 @@ module Given
       check(
         lambda { |value| value == other },
         "<%s> expected to %sbe equal to\n<%s>.\n",
-        other)
+        other.inspect)
     end
 
     def >(other)
       check(lambda { |value| value > other },
         "<%s> expected to %sbe greater than\n<%s>.\n",
-        other)
+        other.inspect)
     end
 
     def <(other)
       check(lambda { |value| value < other },
         "<%s> expected to %sbe less than\n<%s>.\n",
-        other)
+        other.inspect)
     end
 
     def <=(other)
       check(lambda { |value| value <= other },
         "<%s> expected to %sbe less than or equal to\n<%s>.\n",
-        other)
+        other.inspect)
     end
     
     def >=(other)
       check(lambda { |value| value >= other },
         "<%s> expected to %sbe greater than or equal to\n<%s>.\n",
-        other)
+        other.inspect)
     end
 
     def =~(pattern)
       check(lambda { |value| value =~ pattern },
         "<%s> expected to %sbe matched by\n<%s>.\n",
-        pattern)
+        pattern.inspect)
     end
 
     def nil?
@@ -72,7 +74,7 @@ module Given
       if method_name =~ /\?$/
         check(lambda { |value| value.send(sym, *args, &block) },
           "<%s> expected to %sbe %s",
-          [method_name[0..-2]])
+          method_name[0..-2])
       else
         fail Given::UsageError.new("cannot expect anything about #{sym}")
       end

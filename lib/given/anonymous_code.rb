@@ -15,6 +15,10 @@ module Given
     def file_line
       nil
     end
+
+    def to_proc
+      @block
+    end
   end
 
   DO_NOTHING = AnonymousCode.new(lambda { })

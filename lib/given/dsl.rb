@@ -1,5 +1,7 @@
+require 'rubygems'
 require 'given/anonymous_code'
 require 'given/code'
+require 'assert2'
 
 module Given
   module DSL
@@ -115,7 +117,8 @@ module Given
               when_code)
           end
         end
-        given_assert(clause, then_code)
+        #        given_assert(clause, then_code)
+        assert(&then_code)
         invariant_codes.each do |inv|
           given_assert("Invariant", inv)
         end

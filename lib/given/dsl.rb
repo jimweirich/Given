@@ -117,10 +117,11 @@ module Given
               when_code)
           end
         end
-        #        given_assert(clause, then_code)
-        assert(&then_code)
+        # given_assert(clause, then_code)
+        instance_assert(self, &then_code)
         invariant_codes.each do |inv|
-          given_assert("Invariant", inv)
+          # given_assert("Invariant", inv)
+          instance_assert(self, &inv)
         end
       end
     end

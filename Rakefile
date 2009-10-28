@@ -3,10 +3,9 @@ require 'rake/testtask'
 
 CLOBBER.include("html")
 
-task :default => ["test:units", "test:functionals", :examples]
+task :default => ["test:units", :examples]
 
 task :tu => "test:units"
-task :tf => "test:functionals"
 
 EXAMPLE_FILES = FileList['examples/**/*_test.rb']
 desc "Run Examples"

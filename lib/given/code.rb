@@ -8,7 +8,7 @@ module Given
     end
 
     def line_marker
-      "%s%d" % [@mark, eval("__LINE__", @block)]
+      "%s%d" % [@mark, eval("__LINE__", @block.binding)]
     end
 
     def file_line

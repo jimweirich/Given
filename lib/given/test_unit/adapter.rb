@@ -7,21 +7,19 @@ module Test
       #  The new <code>assert()</code> calls this to interpret
       #  blocks of assertive statements.
       #
-      def instance_assert(instance, diagnostic = nil, options = {}, &block)
-        options[:keep_diagnostics] or add_diagnostic :clear
-        
+      def instance_assert(instance, &block)
         begin
-          if got = instance.instance_eval(&block)
-            add_assertion
-            return got
-          end
-        rescue FlunkError
-          raise  #  asserts inside assertions that fail do not decorate the outer assertion
+          ok = instance.instance_eval(&block)
+          add_assertion if ok
+          return ok
+
+        # rescue FlunkError
+        #   raise  #  asserts inside assertions that fail do not decorate the outer assertion
         rescue => got
-          add_exception got
+#          add_exception got
         end
         
-        flunk diagnose(diagnostic, got, caller[1], options, block)
+#        flunk diagnose(diagnostic, got, caller[1], options, block)
       end
     end
   end

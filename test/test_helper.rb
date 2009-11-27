@@ -2,6 +2,25 @@ require 'test/unit'
 require 'given'
 require 'given/test_unit/adapter'
 
+class GivenTestSuite
+  def initialize(name)
+    @name = name
+    @tests = []
+  end
+  def empty?
+    @tests.empty?
+  end
+  def <<(new_test)
+    @tests << new_test
+  end
+  def suite
+    self
+  end
+  def run
+    fail "NYI"
+  end
+end
+
 class GivenTestCase < Test::Unit::TestCase
   private
 
@@ -41,7 +60,6 @@ end
 # We use this to construct test cases.
 class FauxTestCase
   include Test::Unit::Assertions
-  include Test::Unit::Util::BacktraceFilter
   include Given::DSL::TestHelper
   extend Given::DSL
   
@@ -74,7 +92,7 @@ class FauxTestCase
   def self.suite
     method_names = public_instance_methods(true)
     tests = method_names.delete_if {|method_name| method_name !~ /^test./}
-    suite = Test::Unit::TestSuite.new(name)
+    suite = GivenTestSuite.new(name)
     tests.sort.each do
       |test|
       catch(:invalid_test) do
@@ -153,6 +171,10 @@ class FauxTestCase
     @_result.add_failure(Test::Unit::Failure.new(name, filter_backtrace(all_locations), message))
   end
   private :add_failure
+
+  def filter_backtrace(locations)
+    locations
+  end
   
   def add_error(exception)
     @test_passed = false

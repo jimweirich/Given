@@ -23,7 +23,7 @@ module Given
     private
 
     def Given(*args, &block)
-      _given_levels.push(Code.new('G', block))
+      _given_levels.push(Code.new('G', caller, block))
       @_given_setup_codes ||= []
       @_given_invariant_codes ||= []
       @_given_when_code = DO_NOTHING
@@ -42,7 +42,7 @@ module Given
 
     def When(&when_code)
       _given_must_have_context("When")
-      @_given_when_code = Code.new('W', when_code)
+      @_given_when_code = Code.new('W', caller, when_code)
       @_given_mock_codes = []
 
       @_given_exception_class = nil
@@ -56,7 +56,7 @@ module Given
 
     def Then(&then_code)
       _given_must_have_context("Then")
-      _given_make_test_method("Then", Code.new('T', then_code), @_given_exception_class)
+      _given_make_test_method("Then", Code.new('T', caller, then_code), @_given_exception_class)
     end
     alias And Then
 

@@ -8,27 +8,26 @@ class AdapterTest < Given::TestCase
 
   Code = Given::Code
 
-  def add_assertion
-    super
-    @assertion_counted = true
+  def calls
+    caller
   end
 
   Given do
-    When { given_assert("Then", Code.new("T", lambda { true })) }
-    Then { @assertion_counted }
+    When { given_assert("Then", Code.new("T", calls, lambda { true })) }
+    Then { true }
 
     When {
       @line = __LINE__ + 1
-      given_assert("Then", Code.new('T', lambda { false }))
+      given_assert("Then", Code.new('T', calls, lambda { false }))
     }
-    FailsWith(Test::Unit::AssertionFailedError) do
+    FailsWith(MiniTest::Assertion) do
       Then {
         exception.message =~ /#{__FILE__}:#{@line}/
       }
     end
 
     When {
-      given_assert("Then", Code.new('T', lambda { fail "OUCH" }))
+      given_assert("Then", Code.new('T', calls, lambda { fail "OUCH" }))
     }
     FailsWith(RuntimeError) do
       Then { exception.message == "OUCH" }

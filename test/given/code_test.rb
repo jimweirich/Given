@@ -3,8 +3,12 @@ require 'given/test_unit'
 require 'given/anonymous_code'
 
 class CodeContract < Given::TestCase
+  def calls
+    caller
+  end
+
   def a_code_snippet
-    @code = Given::Code.new("T", lambda { :result })
+    @code = Given::Code.new("T", calls, lambda { :result })
   end
 
   Given(:a_code_snippet) do
@@ -15,7 +19,7 @@ class CodeContract < Given::TestCase
 
   def a_line_marked_snippet
     @line = __LINE__ + 1
-    @code = Given::Code.new("T", lambda { :result })
+    @code = Given::Code.new("T", calls, lambda { :result })
   end
 
   Given(:a_line_marked_snippet) do

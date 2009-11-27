@@ -2,7 +2,7 @@ require 'test/unit'
 require 'given'
 require 'given/test_unit/adapter'
 
-class GivenTestSuite
+class FauxTestSuite
   def initialize(name)
     @name = name
     @tests = []
@@ -16,8 +16,8 @@ class GivenTestSuite
   def suite
     self
   end
-  def run
-    fail "NYI"
+  def run(tally)
+    @tests.each do |t| t.run(tally) end
   end
 end
 
@@ -42,7 +42,7 @@ class GivenTestCase < Test::Unit::TestCase
   def run_tests(&block)
     tests = test_class(&block)
     suite = tests.suite
-    tally = Test::Unit::TestResult.new
+    tally = FauxTestResult.new
     suite.run(tally) { }
     tally
   end
@@ -54,6 +54,18 @@ class GivenTestCase < Test::Unit::TestCase
   def default_test
   end
 end  
+
+class FauxTestResult
+  def initialize
+    @runs = 0
+  end
+  def add_run
+    @runs += 1
+  end
+  def passed?
+    true
+  end
+end
 
 # Fake TestCase for testing.  This has everything the real
 # Test::Unit::TestCase has, except that it won't trigger auto-testing.
@@ -92,7 +104,7 @@ class FauxTestCase
   def self.suite
     method_names = public_instance_methods(true)
     tests = method_names.delete_if {|method_name| method_name !~ /^test./}
-    suite = GivenTestSuite.new(name)
+    suite = FauxTestSuite.new(name)
     tests.sort.each do
       |test|
       catch(:invalid_test) do
@@ -111,7 +123,6 @@ class FauxTestCase
   # instance of the fixture, collecting statistics, failures
   # and errors in result.
   def run(result)
-    yield(STARTED, name)
     @_result = result
     begin
       setup
@@ -132,7 +143,6 @@ class FauxTestCase
       end
     end
     result.add_run
-    yield(FINISHED, name)
   end
   
   # Called before every test method runs. Can be used

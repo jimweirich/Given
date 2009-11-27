@@ -10,8 +10,8 @@ module Test
       def instance_assert(instance, &block)
         begin
           ok = instance.instance_eval(&block)
-          add_assertion if ok
-          return ok
+          assert ok
+          return ok if ok
 
         # rescue FlunkError
         #   raise  #  asserts inside assertions that fail do not decorate the outer assertion
@@ -19,7 +19,8 @@ module Test
 #          add_exception got
         end
         
-#        flunk diagnose(diagnostic, got, caller[1], options, block)
+        puts "DBG: diagnose(diagnostic, got, caller[1], options, block)=#{diagnose(diagnostic, got, caller[1], options, block).inspect}"
+        flunk diagnose(diagnostic, got, caller[1], options, block)
       end
     end
   end
@@ -27,7 +28,7 @@ end
 
 module Given
   def self.assertion_failed_exception
-    Test::Unit::AssertionFailedError
+    MiniTest::Assertion
   end
 
   module TestUnit
@@ -36,15 +37,13 @@ module Given
         if code
           message = "\n#{code.file_line} #{message}\n"
         end
-        raise Test::Unit::AssertionFailedError.new(message)
+        raise MiniTest::Assertion.new(message)
       end
 
       def given_assert(clause, code)
-        _wrap_assertion do
-          ok = code.run(self)
-          if ! ok
-            given_failure("#{clause} Condition Failed", code)
-          end
+        ok = code.run(self)
+        if ! ok
+          given_failure("#{clause} Condition Failed", code)
         end
       end
     end

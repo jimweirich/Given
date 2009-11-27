@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'given/anonymous_code'
 require 'given/code'
-require 'assert2'
+#require 'assert2'
 
 module Given
   module DSL

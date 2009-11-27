@@ -5,15 +5,6 @@ CLOBBER.include("html")
 
 task :default => ["test:units", :examples]
 
-task :tu => "test:units"
-
-EXAMPLE_FILES = FileList['examples/**/*_test.rb']
-desc "Run Examples"
-Rake::TestTask.new(:examples) do |t|
-  t.test_files = EXAMPLE_FILES
-  t.warning = true
-end
-
 # README Formatting --------------------------------------------------
 
 require 'redcloth'

@@ -33,9 +33,9 @@ def display_pairs(pairs)
   width = suggest_width(pairs)
   pairs.each do |x, v|
     if v.size > 20
-      printf "%-#{width+2}s\n#{' '*(width+2)} <- %s\n", v, x
+      printf "  %-#{width+2}s\n  #{' '*(width+2)} <- %s\n", v, x
     else
-      printf "%-#{width+2}s <- %s\n", v, x
+      printf "  %-#{width+2}s <- %s\n", v, x
     end
   end
 end
@@ -47,8 +47,9 @@ end
 
 require 'pp'
 
-def run(&block)
+def evaluate(&block)
   file, line = caller_line
+  puts "Evaluating all expressions and subexpressions on #{file}:#{line}"
   lines = open(file).readlines
   code = lines[line.to_i-1]
   sexp = Ripper::SexpBuilder.new(code).parse
@@ -58,11 +59,14 @@ def run(&block)
     [exp, eval_in(exp, block.binding)]
   }
   display_pairs(pairs)
+  puts 
 end
 
 def f(n)
   n*n
 end
+
+# Define a bunch of variables
 
 a = 10
 b = 2
@@ -72,23 +76,23 @@ p = ->(n) { n*n }
 x = 'xyzzy'
 hi = "hello"
 there = "world"
-run { 132 == (a + b) * c and x =~ /z+/ }
-puts
-run { f(f(f(f(a)))) * f(f(b)) }
-puts
-run { Math.sin(0.7) > 0.6 && Math.sin(0.7) < 0.8 }
-puts
-run { [4, 2, 6, 3, 7].sort.select { |n| n % 2 == 0 }.collect { |n| n*n } }
-puts
-run { hi.upcase + ', ' + there.capitalize }
-puts
-run { hi.upcase + ', ' + there.capitalize + n.downcase }
-puts
-run { a == b }
-if RUBY_VERSION >= "1.9.2"
-  puts
-  run { p.(b) }
-end
-puts
-run { a && (a+=2) && a }
+
+
+evaluate { 132 == (a + b) * c and x =~ /z+/ }
+
+evaluate { f(f(f(f(a)))) * f(f(b)) }
+
+evaluate { Math.sin(0.7) > 0.6 && Math.sin(0.7) < 0.8 }
+
+evaluate { [4, 2, 6, 3, 7].sort.select { |n| n % 2 == 0 }.collect { |n| n*n } }
+
+evaluate { hi.upcase + ', ' + there.capitalize }
+
+evaluate { hi.upcase + ', ' + there.capitalize + n.downcase }
+
+evaluate { a == b }
+
+evaluate { p.(b) } if RUBY_VERSION >= "1.9.2"
+
+evaluate { a && (a+=2) && a }
 

@@ -36,7 +36,7 @@ class FailsTest < GivenTestCase
     assert ! tally.passed?
     # FIX: assert2 doesn't propagate messages yet
     ## assert_match(/Then Condition Failed/, failure_message(tally))
-    assert_match(/:#{line}/, failure_message(tally))
+    assert_match(/:#{line}/, tally.failures.first.message)
   end
 
   def test_fails_without_expected_failure_is_not_ok
@@ -61,11 +61,13 @@ class FailsTest < GivenTestCase
 
   def test_fails_with_unexpected_failure_is_not_ok
     line = 0
+    expected_error = ExpectedError
+    actual_error = ActualError
     tally = run_tests do
       Given do
         line = __LINE__ + 1
-        When { fail ActualError }
-        FailsWith(ExpectedError)
+        When { fail actual_error }
+        FailsWith(expected_error)
       end
     end
     assert ! tally.passed?

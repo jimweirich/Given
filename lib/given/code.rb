@@ -17,6 +17,14 @@ module Given
     def file_line
       "#{file}:#{line}"
     end
+    
+    def inspect
+      to_s
+    end
+    
+    def to_s
+      "<Code(#{@mark})@#{file_line}>"
+    end
 
     private
 

@@ -1,5 +1,7 @@
 module Given
   class AnonymousCode
+    attr_reader :block
+
     def initialize(block)
       @block = block
     end
@@ -18,6 +20,14 @@ module Given
 
     def to_proc
       @block
+    end
+    
+    def inspect
+      to_s
+    end
+
+    def to_s
+      "<AnonymousCode@#{@block}>"
     end
   end
 

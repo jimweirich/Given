@@ -69,7 +69,7 @@ module Given
 
     def Invariant(&block)
       @_given_invariant_codes ||= []
-      @_given_invariant_codes += [Code.new('I', block)]
+      @_given_invariant_codes += [c = Code.new('I', caller, block)]
     end
 
     # Internal Use Methods -------------------------------------------
@@ -84,13 +84,15 @@ module Given
     end
 
     def _given_test_name(setup_codes, when_code, then_code)
+      @_given_counter ||= 0
+      @_given_counter += 1
       tags = _given_levels.map { |code| code.line_marker }
       tags << when_code.line_marker
       if then_code
         tags << then_code.line_marker
       end
       tags.compact!
-      sort = "%05d" % tags.last[1..-1].to_i
+      sort = "%05d" % @_given_counter
       "test__#{sort}_#{tags.join('_')}_"
     end
 
@@ -118,10 +120,11 @@ module Given
           end
         end
         # given_assert(clause, then_code)
-        instance_assert(self, &then_code)
+        instance_assert(self, then_code)
+
         invariant_codes.each do |inv|
           # given_assert("Invariant", inv)
-          instance_assert(self, &inv)
+          instance_assert(self, inv)
         end
       end
     end

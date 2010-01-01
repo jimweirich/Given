@@ -26,8 +26,7 @@ class GivenTestCase < Test::Unit::TestCase
 
   # Reach inside the tally object and return the first failure message
   def failure_message(tally)
-    failures = tally.instance_eval { @failures }
-    failures.first.instance_eval { @message }
+    tally.failures.first.message
   end
 
   def assert_all_pass(run_count=nil, &block)
@@ -56,14 +55,30 @@ class GivenTestCase < Test::Unit::TestCase
 end  
 
 class FauxTestResult
+  attr_reader :failures, :errors
   def initialize
     @runs = 0
+    @failures = []
+    @errors = []
   end
   def add_run
     @runs += 1
   end
+  def add_failure(failure)
+    @failures << failure
+  end
+  def add_error(error)
+    fail
+    @errors << error
+  end
   def passed?
-    true
+    @failures.empty? && @errors.empty?
+  end
+  def run_count
+    @runs
+  end
+  def failure_count
+    @failures.size
   end
 end
 
@@ -127,7 +142,7 @@ class FauxTestCase
     begin
       setup
       __send__(@method_name)
-    rescue Test::Unit::AssertionFailedError => e
+    rescue MiniTest::Assertion => e
       add_failure(e.message, e.backtrace)
     rescue Exception
       raise if PASSTHROUGH_EXCEPTIONS.include? $!.class
@@ -178,7 +193,7 @@ class FauxTestCase
   
   def add_failure(message, all_locations=caller())
     @test_passed = false
-    @_result.add_failure(Test::Unit::Failure.new(name, filter_backtrace(all_locations), message))
+    @_result.add_failure(FauxFailure.new(name, message))
   end
   private :add_failure
 
@@ -188,7 +203,7 @@ class FauxTestCase
   
   def add_error(exception)
     @test_passed = false
-    @_result.add_error(Test::Unit::Error.new(name, exception))
+    @_result.add_error(FauxError.new(name, exception.to_s))
   end
   private :add_error
   
@@ -211,6 +226,9 @@ class FauxTestCase
   end
 end
 
+
+FauxFailure = Struct.new(:name, :message)
+FauxError = Struct.new(:name, :message)
 
 class GivenFauxTestCase < FauxTestCase
   include Given::TestUnit::Adapter

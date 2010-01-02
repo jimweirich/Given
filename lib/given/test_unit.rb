@@ -1,7 +1,12 @@
-require 'given'
 require 'test/unit'
+require 'given'
+require 'given/test_unit/adapter'
 
 module Given
+  def self.adapter
+    Given::TestUnitAdapter
+  end
+
   module TestCaseMethods
     def self.included(mod)
       mod.module_eval do
@@ -13,7 +18,6 @@ module Given
 
   class TestCase < Test::Unit::TestCase
     include Given::TestCaseMethods
-
     def test_DUMMY
     end
   end

@@ -6,7 +6,7 @@ require 'given/test_unit'
 require 'given/expectation'
 
 class ExpectationContract < Given::TestCase
-  AssertionFailure = Given::TA.assertion_failed_exception
+  AssertionFailure = Given::TestUnitAdapter.assertion_failed_exception
 
   Given do
     Then { expect(1) == 1 }

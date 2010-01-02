@@ -1,6 +1,5 @@
 require 'given'
 require 'test/unit'
-require 'given/test_unit/adapter'
 
 module Given
   module TestCaseMethods
@@ -8,7 +7,6 @@ module Given
       mod.module_eval do
         extend Given::DSL
         include Given::DSL::TestHelper
-        include Given::TestUnit::Adapter
       end
     end
   end

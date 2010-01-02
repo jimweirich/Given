@@ -6,6 +6,8 @@ require 'given/test_unit'
 require 'given/expectation'
 
 class ExpectationContract < Given::TestCase
+  AssertionFailure = Given::TA.assertion_failed_exception
+
   Given do
     Then { expect(1) == 1 }
     Then { expect(2) > 1 }
@@ -43,43 +45,43 @@ class ExpectationContract < Given::TestCase
 
   Given do
     When { expect(1) == 2 }
-    FailsWith(Given.assertion_failed_exception)
+    FailsWith(AssertionFailure)
     Then { expect(exception.message) =~ /<1> expected to be equal to.*<2>/m }
 
     When { expect([1,2]) == [1,3] }
-    FailsWith(Given.assertion_failed_exception)
+    FailsWith(AssertionFailure)
     Then { expect(exception.message) =~ /<\[1, 2\]> expected to be equal to.*<\[1, 3\]>/m }
 
     When { expect(1).not == 1 }
-    FailsWith(Given.assertion_failed_exception)
+    FailsWith(AssertionFailure)
     Then { expect(exception.message) =~ /<1> expected to not be equal to.*<1>/m }
 
     When { expect(2) > 3 }
-    FailsWith(Given.assertion_failed_exception)
+    FailsWith(AssertionFailure)
     Then { expect(exception.message) =~ /<2> expected to be greater than.*<3>/m }
 
     When { expect(3) < 2 }
-    FailsWith(Given.assertion_failed_exception)
+    FailsWith(AssertionFailure)
     Then { expect(exception.message) =~ /<3> expected to be less than.*<2>/m }
     
     When { expect(3) <= 2 }
-    FailsWith(Given.assertion_failed_exception)
+    FailsWith(AssertionFailure)
     Then { expect(exception.message) =~ /<3> expected to be less than or equal to.*<2>/m }
     
     When { expect(2) >= 3 }
-    FailsWith(Given.assertion_failed_exception)
+    FailsWith(AssertionFailure)
     Then { expect(exception.message) =~ /<2> expected to be greater than or equal to.*<3>/m }
     
     When { expect("abc") =~ /^x/ }
-    FailsWith(Given.assertion_failed_exception)
+    FailsWith(AssertionFailure)
     Then { expect(exception.message) =~ /<"abc"> expected to be matched by.*\^x/m }
 
     When { expect(1).nil? }
-    FailsWith(Given.assertion_failed_exception)
+    FailsWith(AssertionFailure)
     Then { expect(exception.message) =~ /<1> expected to be nil/m }
 
     When { expect([1]).empty? }
-    FailsWith(Given.assertion_failed_exception)
+    FailsWith(AssertionFailure)
     Then { expect(exception.message) =~ /<\[1\]> expected to be empty\.?$/m }
   end
 

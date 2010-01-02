@@ -1,6 +1,5 @@
 require 'test/unit'
 require 'given'
-require 'given/test_unit/adapter'
 
 class FauxTestSuite
   def initialize(name)
@@ -231,8 +230,6 @@ FauxFailure = Struct.new(:name, :message)
 FauxError = Struct.new(:name, :message)
 
 class GivenFauxTestCase < FauxTestCase
-  include Given::TestUnit::Adapter
-
   # A track array is used by many tests to record the order of events.
   def a_track
     @track = []

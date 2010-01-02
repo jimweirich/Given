@@ -1,17 +1,65 @@
 require 'rubygems'
 require 'given/anonymous_code'
 require 'given/code'
-#require 'assert2'
 
 module Given
+  class TA
+    def initialize(tc)
+      @tc = tc
+    end
+
+    # The assertion error used by the framework
+    def self.assertion_failed_exception
+      MiniTest::Assertion
+    end
+
+    # The assertion error used by the framework
+    def assertion_failed_exception
+      self.class.assertion_failed_exception
+    end
+
+    # Make an assertion within the framework
+    def assert(instance, code)
+      begin
+        ok = instance.instance_eval(&code.block)
+        @tc.instance_eval { self._assertions +=1 }
+        return ok if ok
+        
+      rescue assertion_failed_exception => ex
+        puts ex.backtrace
+        raise
+        
+      rescue => got
+        #          add_exception got
+      ensure
+      end
+      
+      @tc.flunk diagnose(got, code)
+    end
+    
+    def diagnose(got, code)
+      code.file_line
+    end
+
+    def given_failure(message, code=nil)
+      if code
+        message = "\n#{code.file_line} #{message}\n"
+      end
+      raise assertion_failed_exception.new(message)
+    end
+  end
+
   module DSL
     module TestHelper
+      def given_adapter
+        @_given_adapter ||= TA.new(self)
+      end
       def exception
         @_given_exception
       end
 
       def given_check(ok, msg, args)
-        given_failure(msg % args) if ! ok
+        given_adapter.given_failure(msg % args) if ! ok
         true
       end
 
@@ -109,22 +157,20 @@ module Given
         else
           begin
             when_code.run(self)
-            given_failure("Expected #{exception_class} Exception", when_code)
+            given_adapter.given_failure("Expected #{exception_class} Exception", when_code)
           rescue exception_class => ex
             @_given_exception = ex
           rescue Exception => ex
             @_given_exception = ex
-            given_failure("Expected #{exception_class} Exception, " +
+            given_adapter.given_failure("Expected #{exception_class} Exception, " +
               "but got #{exception.class}",
               when_code)
           end
         end
-        # given_assert(clause, then_code)
-        instance_assert(self, then_code)
+        given_adapter.assert(self, then_code)
 
         invariant_codes.each do |inv|
-          # given_assert("Invariant", inv)
-          instance_assert(self, inv)
+          given_adapter.assert(self, inv)
         end
       end
     end

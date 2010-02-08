@@ -10,6 +10,13 @@ h2. Status
 
 Given is now at a point where it is usable for small or experimental projects.  I would love for people to give it a try and see how it works out for them.  I wouldn't recommend it for anything mainstream yet because the details of the API are still subject to change.
 
+h2. Links
+
+Documents::       http://github.com/jimweirich/Given
+Git Clone::       git://github.com/jimweirich/Given.git
+Issue Tracking::  http://www.pivotaltracker.com/projects/36147
+Bug Reporting::   http://onestepback.org/cgi-bin/bugs.cgi?project=given
+
 h2. Example Zero
 
 Here's the spec that I've been playing with.  Its gone through mulitple revisions and at least one prototype implementation.  And this is probably not the final form.

@@ -1,20 +1,15 @@
-class Ruby19TestTask < Rake::TestTask
-  RUBY = ENV['RUBY'] || 'ruby19x'
-  def ruby(*args)
-    sh "#{RUBY} #{args.join(' ')}"
-  end
-end
+require 'rake/testtask'
 
 namespace :test do
   desc "Run Examples"
-  Ruby19TestTask.new(:examples) do |t|
+  Rake::TestTask.new(:examples) do |t|
     t.test_files = FileList['examples/**/*_test.rb']
     t.libs = %w(lib .)
     t.warning = true
     t.verbose = true
   end
 
-  Ruby19TestTask.new(:units) do |t|
+  Rake::TestTask.new(:units) do |t|
     t.verbose = true
     t.warning = true
     t.libs = %w(lib .)

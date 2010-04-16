@@ -1,5 +1,5 @@
 require 'rake/gempackagetask'
-require 'lib/given/version'
+require './lib/given/version'
 
 if ! defined?(Gem)
   puts "Package Target requires RubyGEMs"

@@ -98,7 +98,24 @@ describe "Given DSL" do
       ]
     end
   end
+end
 
+describe "DSL with variables in Given" do
+  class GivenVars < FauxContext
+    Given(:x) { 1 }
+    And(:y) { 2 }
+    When { record << x << y  }
+    Then { record << 10*x << 10*y }
+  end
+
+  before { @spec = GivenVars.new.run }
+
+  it 'has variables accessable in When and Then' do
+    @spec.record.should == [1, 2, 10, 20]
+  end
+end
+
+describe "DSL with failing conditions" do
   context "with failing thens" do
     class FailingThen < FauxContext
       Given { }

@@ -1,20 +1,12 @@
 require 'rake/testtask'
+require 'spec/rake/spectask'
 
-namespace :test do
-  desc "Run Examples"
-  Rake::TestTask.new(:examples) do |t|
-    t.test_files = FileList['examples/**/*_test.rb']
-    t.libs = %w(lib .)
-    t.warning = true
-    t.verbose = true
-  end
-
-  Rake::TestTask.new(:units) do |t|
-    t.verbose = true
-    t.warning = true
-    t.libs = %w(lib .)
-    t.test_files = FileList['test/**/*_test.rb']
+namespace :spec do
+  desc "Generate HTML report for failing examples"
+  Spec::Rake::SpecTask.new('spec') do |t|
+    t.spec_opts = ['--options', 'spec/spec.opts']
+    t.spec_files = FileList['spec/**/*.rb']
   end
 end
 
-task :tu => "test:units"
+task :spec => "spec:spec"

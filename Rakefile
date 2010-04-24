@@ -3,7 +3,7 @@ require 'rake/testtask'
 
 CLOBBER.include("html")
 
-task :default => ["test:units", :examples]
+task :default => [:spec, :examples]
 
 # README Formatting --------------------------------------------------
 

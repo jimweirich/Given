@@ -1,9 +1,1 @@
-;; -*- mode: emacs-lisp; -*-
-
-(add-to-list
- 'toggle-mapping-styles
- '(jw-kata
-   ("test/\\1_test.rb" . "lib/\\1.rb")
-   ("\\1_test.rb"      . "\\1.rb")))
-
-(buffer-toggle-style 'jw-kata)
+(buffer-toggle-style 'jw-spec)

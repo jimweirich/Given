@@ -17,7 +17,7 @@ module Given
     end
 
     def failure_message_for_should_not
-      "Error in block -- shouldn't get this"
+      "Error in block -- shouldn't get this message"
     end
   end
   

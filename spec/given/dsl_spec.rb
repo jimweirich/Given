@@ -88,9 +88,9 @@ describe "Given DSL" do
 
     it "runs all the blocks in order" do
       @spec.record.should == [
-        :inv1, :inv2, :given1, :then1a,
-        :inv1, :inv2, :given1, :then1b,
-        :inv1, :inv2, :given2, :then2,
+        :given1, :then1a, :inv1, :inv2,
+        :given1, :then1b, :inv1, :inv2,
+        :given2, :then2, :inv1, :inv2,
       ]
     end
   end

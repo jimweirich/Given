@@ -2,7 +2,7 @@ p{display=none}. <notextile><!-- -*- mode: textile; fill-column: 1000000; -*- --
 
 h1. Thoughts on a new Ruby Specification Framework
 
-I've been playing aournd with some ideas for a new testing/specification framework for Ruby[1].  I've been trying to write down some of the motivation for this, but that's taking too long.  I just want to get some ideas down and published for review and we will address the whys and wherefores later.
+I've been playing around with some ideas for a new testing/specification framework for Ruby[1].  I've been trying to write down some of the motivation for this, but that's taking too long.  I just want to get some ideas down and published for review and we will address the whys and wherefores later.
 
 Essentially, I've been inspired by the Cucumber framework to bring the given/when/then style of specifications directly into unit tests.  So let's get right into it.
 
@@ -80,7 +80,7 @@ The _Given_ section specifies a starting point, a set of preconditions that must
 
 In the example code above, we see two starting points of interest.  One is an empty, just freshly created stack.  The other starting point is a stack with several items already push onto it.
 
-The setup methods are explicitly named by the given section.  The name of the setup method should be carefully named to provide the human reader the necessary information. 
+The setup methods are explicitly named by the given section.  The name of the setup method should be carefully named to provide the human reader the necessary information.
 
 h3. When
 
@@ -149,7 +149,7 @@ I really like the idea of being able to just say:
 and have that raw ruby code be the expectation for the specification.  Unfortunately, that has two drawbacks when I got down into the nitty gritty details.
 
 # It just returns a boolean value.  So when the expectation fails, all the reporting software can to is just say the expectation failed.  It can't give any details about why the expectation failed.
-# The second problem is another reporting problem.  When the Then block returns false an AssertionFailed error will be thrown and handled by the test running software.  Unfortunately the error is thrown from a point in the stack after the Then code block has completed running, therefore the source code location of the offending Then block is no longer in the stack trace.  
+# The second problem is another reporting problem.  When the Then block returns false an AssertionFailed error will be thrown and handled by the test running software.  Unfortunately the error is thrown from a point in the stack after the Then code block has completed running, therefore the source code location of the offending Then block is no longer in the stack trace.
 
 Both of these problems can be solved if the AssertionFailed error was thrown while the Then block was still active.  So how do we accomplish that?
 

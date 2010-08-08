@@ -11,7 +11,7 @@ describe "FauxContext" do
         record << :done
       end
     end
-    
+
     it "runs runs the it block" do
       @spec = FauxSample.new.run
       @spec.record.should == [:done]
@@ -25,7 +25,7 @@ describe "Given DSL" do
       Given { record << :given }
       Then  { record << :then }
     end
-    
+
     before do
       @spec = GivenThen.new.run
     end
@@ -43,7 +43,7 @@ describe "Given DSL" do
       When  { record << :when }
       Then  { record << :then }
     end
-    
+
     before do
       @spec = MultiGivens.new.run
     end
@@ -61,7 +61,7 @@ describe "Given DSL" do
       Then  { record << :then1 }
       Then  { record << :then2 }
     end
-    
+
     before do
       @spec = MultiThens.new.run
     end
@@ -85,7 +85,7 @@ describe "Given DSL" do
       Given { record << :given2 }
       Then  { record << :then2 }
     end
-    
+
     before do
       @spec = Inv.new.run
     end
@@ -121,7 +121,7 @@ describe "DSL with failing conditions" do
       Given { }
       Then  { false }
     end
-    
+
     it "throws an RSpec exception" do
       lambda do
         FailingThen.new.run
@@ -135,7 +135,7 @@ describe "DSL with failing conditions" do
       Given { }
       Then  { true }
     end
-    
+
     it "throws an RSpec exception from the invarient" do
       lambda do
         FailingInv.new.run

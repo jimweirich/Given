@@ -2,7 +2,8 @@ require 'given'
 
 class FauxContext
   extend Given::DSL
-  
+  include Given::GivenMatcher
+
   def record
     @record ||= []
   end
@@ -14,7 +15,7 @@ class FauxContext
     end
     self
   end
-  
+
   def codes
     self.class.codes
   end

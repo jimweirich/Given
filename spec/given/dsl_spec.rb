@@ -1,9 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-class FauxContext
-  include Given::GivenMatcher
-end
-
 describe "FauxContext" do
   context "basic faux context operation" do
     class FauxSample < FauxContext

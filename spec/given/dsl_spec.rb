@@ -139,3 +139,18 @@ describe "DSL with failing conditions" do
     end
   end
 end
+
+describe "Given DSL error conditions" do
+  context "with two whens" do
+    it "fails with an usage error" do
+      lambda do
+        class TwoWhens < FauxContext
+          Given { }
+          When { record << :one }
+          When { record << :two }
+          Then { true }
+        end
+      end.should raise_error(StandardError, /when.*defined/i)
+    end
+  end
+end

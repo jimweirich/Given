@@ -13,10 +13,8 @@ let's get right into it.
 
 ## Status
 
-Given is now at a point where it is usable for small or experimental
-projects.  I would love for people to give it a try and see how it
-works out for them.  I wouldn't recommend it for anything mainstream
-yet because the details of the API are still subject to change.
+Given has gone through several experimental prototypes and is not
+currently in a usable state.
 
 ## Example Zero
 
@@ -43,9 +41,9 @@ describe Stack do
 
     Scenario "Popping an empty stack is an error"
     When { stack.pop }
-    Then.fails(Stack::UsageError) { |ex|
-      ex.message =~ /empty/i
-    }
+    Then.fails(Stack::UsageError)
+    Then { exception.message =~ /empty/i }
+    Then.compare { stack.depth }.with { old == new }
 
     Scenario "Pushing an item on the stack adds the item to the top"
     When { stack.push(:an_item) }
@@ -67,7 +65,11 @@ describe Stack do
     Given(:stack) { Stack.new }
     Given { stack.push(:second_item) }
     Given { stack.push(:top_item) }
-    Given(:old_depth) { stack.depth }
+
+    Scenario "pushing a new item adds a new top"
+    When { stack.push(:new_item) }
+    Then { stack.top == :new_item }
+    Then.with { stack.depth }.compare { new == old+1 }
 
     Scenario "popping an item removes the top item"
     When { stack.pop }
@@ -169,6 +171,9 @@ The following accessor are special.
   expresion.  The new value is captured immediately after the _When_
   block is executed.  _new_ is only valid in a
   _Then_/_with_/_compare_.
+
+* _exception_ -- Returns the exception captured by a _Then.fail_.
+  This accessor is only valid in a scenario where _Then.fail_ is used.
 
 ## Summary
 

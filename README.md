@@ -43,7 +43,7 @@ describe Stack do
     When { stack.pop }
     Then.fails(Stack::UsageError)
     Then { exception.message =~ /empty/i }
-    Then.compare { stack.depth }.with { old == new }
+    Then.with { stack.depth }.compare { old == new }
 
     Scenario "Pushing an item on the stack adds the item to the top"
     When { stack.push(:an_item) }
@@ -125,7 +125,7 @@ The code in the _Then_ block should be a single boolean condition that
 evaluates to true if the code in the _When_ block is correct.  If the
 _Then_ block evaluates to false, then that is recorded as a failure.
 
-### Then.fails(error_class) { |ex| ...}
+### Then.fails(error_class)
 
 A special _Then_ form that specifies that _When_ block will throw an
 exception.  The class of the exception must be either error\_class, or

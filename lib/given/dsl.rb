@@ -1,3 +1,4 @@
+require 'given/code_block'
 
 module Given
   class BeGivenEvaluated
@@ -31,64 +32,56 @@ end
 module Given
   module DSL
 
-    def _given_invariants
-      @_given_invariants ||= lambda { |spec| puts "DBG: INVAR ROOT" }
+    def _g__invariants
+      @_g__invariants ||= []
     end
 
-    private
 
-    def _given_append_to_invariant_chain(block)
-      previous_code = _given_invariants
-      puts "DBG: ADDING INV"
-      @_given_invariants = lambda { |spec|
-        puts "DBG: INV CODE"
-        spec.instance_exec(spec, &previous_code)
-        block.should be_given_evaluated(self)
-      }
+    def _g__test_code
+      @_g__test_code ||= []
     end
 
-    def _given_append_to_code_chain(block, var=nil)
-      previous_code = @_given_code
+    def _g__append_to_invariants(block)
+      _g__invariants << block
+    end
+
+    def _g__append_to_test_code(block, var=nil)
       if var
-        @_given_code = lambda { |spec|
-          puts "DBG: CODE W/VAR"
-          spec.instance_exec(spec, &previous_code)
+        @_g__blocks << CodeBlock.new { |spec|
           spec.instance_variable_set("@#{var}", spec.instance_exec(&block))
         }
       else
-        @_given_code = lambda { |spec|
-          puts "DBG: CODE W/O VAR"
-          spec.instance_exec(spec, &previous_code)
+        @_g__blocks << lambda { |spec|
           spec.instance_exec(&block)
         }
       end
     end
 
     def Invariant(&block)
-      _given_append_to_invariant_chain(block)
+      _g__invariants << CodeBlock.new(&block)
     end
 
     def Given(var=nil, &block)
-      @_given_when_defined = false
-      @_given_code = lambda { |spec| }
+      @_g__when_defined = false
+      @_g__blocks = []
       define_method(var) { instance_variable_get("@#{var}") } if var
-      _given_append_to_code_chain(block, var)
+      _g__append_to_test_code(block, var)
     end
 
     def And(var=nil, &block)
       define_method(var) { instance_variable_get("@#{var}") } if var
-      _given_append_to_code_chain(block, var)
+      _g__append_to_test_code(block, var)
     end
 
     def When(&block)
-      fail Given::UsageError, "When already defined" if @_given_when_defined
-      @_given_when_defined = true
-      _given_append_to_code_chain(block)
+      fail Given::UsageError, "When already defined" if @_g__when_defined
+      @_g__when_defined = true
+      _g__append_to_test_code(block)
     end
 
     def Then(&block)
-      previous_code = @_given_code
-      invariant_code = _given_invariants
+      previous_code = @_g__blocks
+      invariant_code = _g__invariants
       it "scenario" do
         previous_code.call(self)
         block.should be_given_evaluated(self)

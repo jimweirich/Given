@@ -1,0 +1,284 @@
+# Thoughts on a new Ruby Specification Framework
+
+I've been playing around with some ideas for a new
+testing/specification framework for Ruby[1].  I've been trying to
+write down some of the motivation for this, but that's taking too
+long.  I just want to get some ideas down and published for review and
+we will address the whys and wherefores later.
+
+Essentially, I've been inspired by the Cucumber framework to bring the
+given/when/then style of specifications directly into unit tests.  So
+let's get right into it.
+
+## Status
+
+Given is now at a point where it is usable for small or experimental
+projects.  I would love for people to give it a try and see how it
+works out for them.  I wouldn't recommend it for anything mainstream
+yet because the details of the API are still subject to change.
+
+## Example Zero
+
+Here's the spec that I've been playing with.  Its gone through
+mulitple revisions and at least one prototype implementation.  And
+this is probably not the final form.
+
+With all that in mind, here's a specification in my imaginary
+framework:
+
+<pre>
+require 'given/test_unit'
+require 'examples/stack'
+
+class StackBehavior < Given::TestCase
+  Invariant { expect(@stack.depth) >= 0 }
+  Invariant { expect(@stack.empty?) == (@stack.depth == 0) }
+
+  def empty_stack
+    @stack = Stack.new
+  end
+
+  Given(:empty_stack) do
+    Then { expect(@stack.depth) == 0 }
+
+    When { @stack.push(:an_item) }
+    Then { expect(@stack.depth) == 1 }
+    Then { expect(@stack.top) == :an_item }
+
+    When { @stack.pop }
+    FailsWith(Stack::UsageError)
+    Then { expect(exception.message) =~ /empty/ }
+  end
+
+  def stack_with_two_items
+    empty_stack
+    @stack.push(:bottom_item)
+    @stack.push(:top_item)
+  end
+
+  Given(:stack_with_two_items) {
+    Then { expect(@stack.top) == :top_item }
+    Then { expect(@stack.depth) == 2}
+
+    When { @result = @stack.pop }
+    Then { expect(@result) == :top_item }
+    Then { expect(@stack.top) == :bottom_item }
+    Then { expect(@stack.depth) == 1 }
+
+    When {
+      @stack.pop
+      @result = @stack.pop
+    }
+    Then { expect(@result) == :bottom_item }
+    Then { expect(@stack.depth) == 0 }
+  }
+end
+</pre>
+
+Let's talk about the individual sections.
+
+### Given
+
+The _Given_ section specifies a starting point, a set of preconditions
+that must be true before the code under test is allowed to be run.  In
+standard test frameworks the preconditions are established with a
+combination of setup methods (or :before actions in RSpec) and code in
+the test.
+
+In the example code above, we see two starting points of interest.
+One is an empty, just freshly created stack.  The other starting point
+is a stack with several items already push onto it.
+
+The setup methods are explicitly named by the given section.  The name
+of the setup method should be carefully named to provide the human
+reader the necessary information.
+
+### When
+
+The _When_ section specifies the code to be tested ... oops, excuse me
+... specified.  After the preconditions in the given section are met,
+the when code block is run.
+
+### Then
+
+The _Then_ sections are the postconditions of the specification. These
+then conditions must be true after the code under test (the _When_
+block) is run.
+
+The code in the _Then_ block should be a single boolean condition that
+evaluates to true if the code in the _When_ block is correct.  If the
+_Then_ block evaluates to false, then that is recorded as a failure.
+
+### Invariant
+
+The _Invariant_ block is a new idea that doesn't have an analog in
+RSpec or Test::Unit.  The invariant allows you specify things that
+must always be true.  In the stack example, <tt>empty?</tt> is defined
+in term of <tt>size</tt>.  Whenever <tt>size</tt> is 0,
+<tt>empty?</tt> should be true.  Whenever <tt>size</tt> is non-zero,
+<tt>empty?</tt> should be false.
+
+You can conceptually think of an _Invariant_ block as a _Then_ block
+that automatically gets added to every _When_ within its scope.
+
+## Other Ideas
+
+That's the basics of what I'm trying to do.  Here are some more ideas.
+
+### Nesting Givens
+
+Although the example doesn't demonstrate this, I think the _Given_
+blocks should be allowed to nest.  This is similar to the nested
+contexts in Shoulda or the nested describe blocks in RSpec.
+
+### Direct Code in Givens
+
+Since the block on a _Given_ section is used to scope the
+<em>When</em>'s and <em>Then</em>s, it can't be used to directly
+specify the setup code.  That's why we put the setup code in a named
+method and pass the name of the method to the _Given_.  I actually
+like the way that reads, but also am wondering if there is a way to
+allow direct code as well.
+
+Here's one idea:
+
+<pre>
+  Given(Setup { @stack = Stack.new }) do
+    When { ... }
+    Then { ... }
+  end
+</pre>
+
+Here's another idea:
+
+<pre>
+  Given { @stack = Stack.new }.and do
+    When { ... }
+    Then { ... }
+  end
+</pre>
+
+I think both options are ugly.
+
+## Recent Changes
+
+### Contract/Behavior -> TestCase
+
+I've been playing with the idea of calling the containing classes
+either Give::Behavior or Given::Contract.  I like the name Contract.
+And while the pre/post condition thing is very close to the idea of
+contracts, its not quite the same thing.  Behavior comes close to
+describing the idea in my head, but I'm not overly fond of the word
+itself.
+
+So finally, I just tossed both ideas and just went with
+Given::TestCase.  The first implementation of Given is on top of
+Test::Unit, and we allow Test::Unit style test_xxx methods in the
+class, so there's no need to hide it.
+
+### Expectations
+
+I really like the idea of being able to just say:
+
+<pre>
+  Then { @result == 1 }
+</pre>
+
+and have that raw ruby code be the expectation for the specification.
+Unfortunately, that has two drawbacks when I got down into the nitty
+gritty details.
+
+1. It just returns a boolean value.  So when the expectation fails, all the reporting software can to is just say the expectation failed.  It can't give any details about why the expectation failed.
+1. The second problem is another reporting problem.  When the Then block returns false an AssertionFailed error will be thrown and handled by the test running software.  Unfortunately the error is thrown from a point in the stack after the Then code block has completed running, therefore the source code location of the offending Then block is no longer in the stack trace.  
+
+Both of these problems can be solved if the AssertionFailed error was
+thrown while the Then block was still active.  So how do we accomplish
+that?
+
+#### Idea #1 -- Use assert_xxx
+
+We could just code the assert_equal (and related assert_xxx functions)
+explicitly in the Then block.
+
+<pre>
+  Then { assert_equal 1, @result }
+</pre>
+
+This will actually almost work with no changes.  Only one small
+problem, assert_xxx methods do not necessarily return true if the
+assertion passed.  Therefore, the assert can pass, but the Then will
+fail because assert_equal returns nil.
+
+I imagine I might have to give up that particular behavior of Then blocks, but I'm not ready to yet.
+
+The bigger problem is that it is just too ugly.  I'm afraid people
+will be tempted to put multiple asserts in a single Then, something
+I'm trying to discourage.
+
+#### Idea #2 -- Use RSpec-like Syntax
+
+We could just use RSpec like syntax in the Then block:
+
+<pre>
+  Then { @result.should == 1 }
+</pre>
+
+In fact, the Matchy library will allow us to use the .should notation
+in test unit.  It should work for Given as well.  There is one minor
+problem with this and one philosophical problem.  The minor problem is
+that like assert_xxx, the Matchy .should methods return non-true if
+the assertion passes.
+
+The philosophical problem is that I really dislike polluting Object's
+namespace dropping a should method into every object.  It just rubs me
+the wrong way.
+
+#### Idea #3 -- ParseTree
+
+This suggestion falls in the category of bizzare and weird.  Why not
+use ParseTree to get the s-expression of the Ruby code in the Then
+block and parse out the individual pieces of the code and find
+whatever it needs for the error messages.
+
+Althought the idea sounds cool, it also sounds really fragile.
+ParseTree pulls out the internal parse tree generated by the Ruby
+runtime, and that internal data structure has been known to change
+between version.  Also, ParseTree doesn't run under JRuby so we would
+be artificially limiting the usefulness of the Given library.  No,
+this idea doesn't even get off the ground.
+
+#### Idea #4 -- Redefine operators
+
+We could redefine operators like == throw exceptions at the
+appropriate times. This would allow the Then blocks to remain simple
+Ruby expressions.  There are multiple problems with this:
+
+1. The operator redefinitions would have to be applied at the beginning of the block and removed after the block was done.  Although doable, this seems like a lot of definition churn.
+1. The operator redefinitions should only apply at the top level of the expression.  Currenly, I have no idea of how to accomplish this.
+1. Since operators have different definitions for each class, the operators would have to be redefined for all classes.
+1. This only addresses expressions with an operator at the top level.  It still doesn't handle expressions like: <code>Then { @result.nil? }</code>.
+
+#### Idea #5 -- expect()
+
+Here's idea stolen from one of the Javascript testing libraries.  If
+we wrap the item we are making assertions about in a method, we can
+have that method return an expectation object that properly responds
+to operators and queries.  If we name that object properly, then we
+should a nicely readable syntax too.  Something like this:
+
+<pre>
+  Then { expect(@result) == 1 }
+  Then { expect(@result).nil? }
+</pre>
+
+Technically, this is equivalent to the RSpec/Should solution, but
+without polluting the global object namespace.  And it reads almost as
+well.  I think I like this.
+
+## Summary
+
+Feel free to comment on the ideas here.  Eventually I hope to have a
+working prototype.
+
+<hr>
+fn1. Right, like Ruby doesn't have enough of them.

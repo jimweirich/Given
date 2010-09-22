@@ -31,11 +31,28 @@ require 'examples/stack'
 
 describe Stack do
 
+  def an_empty_stack
+    Stack.new
+  end
+
+  def a_stack_with_one_item
+    stack = Stack.new
+    stack.push(:an_item)
+    stack
+  end
+
+  def a_stack_with_several_items
+   stack = Stack.new
+   stack.push(:second_item)
+   stack.push(:top_item)
+   stack
+  end
+
   Invariant { stack.depth >= 0 }
   Invariant { stack.empty? == (stack.depth == 0) }
 
   context "an empty stack" do
-    Given(:stack) { Stack.new }
+    Given(:stack) { an_empty_stack }
 
     Then { stack.depth == 0 }
 
@@ -52,8 +69,7 @@ describe Stack do
   end
 
   context "a stack with one item do
-    Given(:stack) { Stack.new }
-    Given { stack.push(:an_item) }
+    Given(:stack) { a_stack_with_one_item }
 
     Scenario "popping an item empties the stack"
     When { stack.pop }
@@ -62,9 +78,7 @@ describe Stack do
   end
 
   context "a stack with several items" do
-    Given(:stack) { Stack.new }
-    Given { stack.push(:second_item) }
-    Given { stack.push(:top_item) }
+    Given(:stack) { a_stack_with_several_items }
 
     Scenario "pushing a new item adds a new top"
     When { stack.push(:new_item) }
